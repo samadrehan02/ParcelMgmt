@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}My Parcels - Parcel Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="card reveal">
+        <div class="card-header">
+            <div>
+                <h1 class="card-title">
+                    <i class="fas fa-box"></i> My Parcels
+                </h1>
+                <p class="card-subtitle">Manage and track all your parcels</p>
+            </div>
+            <a href="/create-parcel" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Parcel
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="card reveal" style="padding: 0.75rem;">
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">
+                <i class="fas fa-th-large"></i> All Parcels
+            </button>
+            <button class="filter-tab" data-filter="sent">
+                <i class="fas fa-arrow-up"></i> Sent
+            </button>
+            <button class="filter-tab" data-filter="received">
+                <i class="fas fa-arrow-down"></i> Received
+            </button>
+        </div>
+    </div>
+
+    <!-- Parcels Table -->
+    <div class="card reveal">
+        <div id="parcels-container">
+            <div class="loading-pulse" style="padding: 3rem;">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <p style="text-align: center; color: var(--secondary-color);">Loading your parcels...</p>
+        </div>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="stats-grid reveal" style="margin-top: 2rem;">
+        <div class="stat-card" style="cursor: default;">
+            <div class="stat-icon blue">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="total-parcels">0</h3>
+                <p>Total Parcels</p>
+            </div>
+        </div>
+
+        <div class="stat-card" style="cursor: default;">
+            <div class="stat-icon orange">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="pending-parcels">0</h3>
+                <p>Pending</p>
+            </div>
+        </div>
+
+        <div class="stat-card" style="cursor: default;">
+            <div class="stat-icon purple">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="in-transit-parcels">0</h3>
+                <p>In Transit</p>
+            </div>
+        </div>
+
+        <div class="stat-card" style="cursor: default;">
+            <div class="stat-icon green">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="delivered-parcels">0</h3>
+                <p>Delivered</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let allParcels = [];
+let currentFilter = 'all';
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadParcels();
+    setupFilters();
+});
+
+function setupFilters() {
+    const filterTabs = document.querySelectorAll('.filter-tab');
+
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            // Remove active class from all tabs
+            filterTabs.forEach(t => t.classList.remove('active'));
+
+            // Add active class to clicked tab
+            e.currentTarget.classList.add('active');
+
+            // Apply filter
+            currentFilter = e.currentTarget.dataset.filter;
+            applyFilter();
+        });
+    });
+}
+
+async function loadParcels() {
+    const token = localStorage.getItem('token');
+    const container = document.getElementById('parcels-container');
+
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+
+    try {
+        // Load sent and received parcels
+        const [sentRes, receivedRes] = await Promise.all([
+            fetch('/api/parcels/sent', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('/api/parcels/received', { headers: { 'Authorization': `Bearer ${token}` } })
+        ]);
+
+        if (sentRes.ok && receivedRes.ok) {
+            const sent = await sentRes.json();
+            const received = await receivedRes.json();
+
+            // Mark parcels as sent or received
+            allParcels = [
+                ...sent.map(p => ({ ...p, parcelType: 'sent' })),
+                ...received.map(p => ({ ...p, parcelType: 'received' }))
+            ];
+
+            // Sort by date
+            allParcels.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            updateStats();
+            applyFilter();
+        } else if (sentRes.status === 401 || receivedRes.status === 401) {
+            window.location.href = '/login';
+        } else {
+            throw new Error('Failed to load parcels');
+        }
+    } catch (error) {
+        console.error('Error loading parcels:', error);
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle empty-state-icon" style="font-size: 3rem; color: var(--danger-color);"></i>
+                <h3>Failed to load parcels</h3>
+                <p>Please try again later</p>
+                <button class="btn btn-primary mt-2" onclick="loadParcels()">
+                    <i class="fas fa-sync"></i> Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+function updateStats() {
+    const total = allParcels.length;
+    const pending = allParcels.filter(p => p.status === 'pending').length;
+    const inTransit = allParcels.filter(p => ['picked_up', 'in_transit', 'out_for_delivery'].includes(p.status)).length;
+    const delivered = allParcels.filter(p => p.status === 'delivered').length;
+
+    animateValue('total-parcels', parseInt(document.getElementById('total-parcels').textContent), total, 1000);
+    animateValue('pending-parcels', parseInt(document.getElementById('pending-parcels').textContent), pending, 1000);
+    animateValue('in-transit-parcels', parseInt(document.getElementById('in-transit-parcels').textContent), inTransit, 1000);
+    animateValue('delivered-parcels', parseInt(document.getElementById('delivered-parcels').textContent), delivered, 1000);
+}
+
+function animateValue(id, start, end, duration) {
+    if (start === end) return;
+    const range = end - start;
+    const increment = end > start ? 1 : -1;
+    const stepTime = Math.abs(Math.floor(duration / range));
+    const obj = document.getElementById(id);
+    let current = start;
+
+    const timer = setInterval(() => {
+        current += increment;
+        obj.textContent = current;
+        if (current === end) {
+            clearInterval(timer);
+        }
+    }, stepTime > 0 ? stepTime : 10);
+}
+
+function applyFilter() {
+    let filtered = allParcels;
+
+    if (currentFilter === 'sent') {
+        filtered = allParcels.filter(p => p.parcelType === 'sent');
+    } else if (currentFilter === 'received') {
+        filtered = allParcels.filter(p => p.parcelType === 'received');
+    }
+
+    displayParcels(filtered);
+}
+
+function displayParcels(parcels) {
+    const container = document.getElementById('parcels-container');
+
+    if (parcels.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="padding: 3rem;">
+                <i class="fas fa-box-open empty-state-icon"></i>
+                <h3>No parcels found</h3>
+                <p>${currentFilter === 'all' ? "You haven't sent or received any parcels yet" : 'No parcels in this category'}</p>
+                ${currentFilter === 'all' ? '<a href="/create-parcel" class="btn btn-primary mt-2">Send Your First Parcel</a>' : ''}
+            </div>
+        `;
+        return;
+    }
+
+    const html = `
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tracking #</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Weight</th>
+                        <th>Cost</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${parcels.map((parcel, index) => `
+                        <tr style="animation: slideInRight 0.4s ease-out ${index * 0.05}s backwards;">
+                            <td>
+                                <strong style="font-family: var(--font-mono); font-size: 0.9rem;">${parcel.tracking_number}</strong>
+                            </td>
+                            <td>
+                                <span class="badge" style="
+                                    background: ${parcel.parcelType === 'sent' ? 'var(--info-bg)' : 'rgba(236, 72, 153, 0.1)'};
+                                    color: ${parcel.parcelType === 'sent' ? 'var(--info-color)' : '#be185d'};
+                                    border: 1px solid ${parcel.parcelType === 'sent' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(236, 72, 153, 0.3)'};
+                                ">
+                                    <i class="fas ${parcel.parcelType === 'sent' ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
+                                    ${parcel.parcelType === 'sent' ? 'Sent' : 'Received'}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge badge-${parcel.status}">
+                                    <i class="fas ${getStatusIcon(parcel.status)}"></i>
+                                    ${formatStatus(parcel.status)}
+                                </span>
+                            </td>
+                            <td>${parcel.weight} kg</td>
+                            <td>${parcel.shipping_cost ? '$' + parcel.shipping_cost.toFixed(2) : 'N/A'}</td>
+                            <td>${formatDate(parcel.created_at)}</td>
+                            <td>
+                                <a href="/track?number=${parcel.tracking_number}" class="btn btn-secondary btn-sm"
+                                    style="padding: 0.5rem 1rem;">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+function getStatusIcon(status) {
+    const icons = {
+        'pending': 'fa-clock',
+        'picked_up': 'fa-hand-holding',
+        'in_transit': 'fa-truck',
+        'out_for_delivery': 'fa-shipping-fast',
+        'delivered': 'fa-check-circle',
+        'cancelled': 'fa-times-circle'
+    };
+    return icons[status] || 'fa-circle';
+}
+
+function formatStatus(status) {
+    const statusMap = {
+        'pending': 'Pending',
+        'picked_up': 'Picked Up',
+        'in_transit': 'In Transit',
+        'out_for_delivery': 'Out for Delivery',
+        'delivered': 'Delivered',
+        'cancelled': 'Cancelled'
+    };
+    return statusMap[status] || status;
+}
+
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+// Add slideInRight keyframes
+if (!document.getElementById('slideInRight-style')) {
+    const style = document.createElement('style');
+    style.id = 'slideInRight-style';
+    style.textContent = `
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+</script>
+{% endblock %}
