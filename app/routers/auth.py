@@ -36,14 +36,14 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
             detail="Email already registered"
         )
 
-    # Create new user
+    # Create new user — role is always CUSTOMER regardless of what was submitted
     db_user = models.User(
         email=user.email,
         username=user.username,
         full_name=user.full_name,
         phone=user.phone,
         address=user.address,
-        role=user.role,
+        role=models.UserRole.CUSTOMER,
         hashed_password=get_password_hash(user.password)
     )
     db.add(db_user)
@@ -91,7 +91,7 @@ def update_user(
     current_user: models.User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    for field, value in user_update.dict(exclude_unset=True).items():
+    for field, value in user_update.model_dump(exclude_unset=True).items():
         setattr(current_user, field, value)
 
     db.commit()

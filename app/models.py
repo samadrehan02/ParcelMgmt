@@ -1,8 +1,12 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Enum, Text
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Enum, Text, Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
 import enum
-from datetime import datetime
+from datetime import datetime, timezone
+
+
+def utcnow():
+    return datetime.now(timezone.utc)
 
 
 class UserRole(str, enum.Enum):
@@ -30,8 +34,8 @@ class User(Base):
     phone = Column(String, nullable=True)
     address = Column(Text, nullable=True)
     role = Column(Enum(UserRole), default=UserRole.CUSTOMER)
-    is_active = Column(Integer, default=1)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=utcnow)
 
     parcels_sent = relationship("Parcel", foreign_keys="Parcel.sender_id", back_populates="sender")
     parcels_received = relationship("Parcel", foreign_keys="Parcel.receiver_id", back_populates="receiver")
@@ -61,11 +65,11 @@ class Parcel(Base):
 
     # Pricing
     shipping_cost = Column(Float, nullable=True)
-    is_paid = Column(Integer, default=0)
+    is_paid = Column(Boolean, default=False)
 
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utcnow)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
 
     # Relationships
     sender = relationship("User", foreign_keys=[sender_id], back_populates="parcels_sent")
@@ -81,6 +85,6 @@ class TrackingEvent(Base):
     status = Column(String, nullable=False)
     location = Column(String, nullable=True)
     description = Column(Text, nullable=True)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=utcnow)
 
     parcel = relationship("Parcel", back_populates="tracking_history")

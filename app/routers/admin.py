@@ -43,7 +43,7 @@ def get_dashboard_stats(
 
     # Total revenue from paid parcels
     revenue = db.query(func.sum(models.Parcel.shipping_cost)).filter(
-        models.Parcel.is_paid == True
+        models.Parcel.is_paid.is_(True)
     ).scalar() or 0.0
 
     return schemas.DashboardStats(
@@ -94,7 +94,7 @@ def update_user(
             detail="User not found"
         )
 
-    for field, value in user_update.dict(exclude_unset=True).items():
+    for field, value in user_update.model_dump(exclude_unset=True).items():
         setattr(user, field, value)
 
     db.commit()
@@ -121,6 +121,19 @@ def delete_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot delete yourself"
         )
+
+    # Delete tracking events for the user's parcels, then the parcels themselves
+    parcel_ids = [p.id for p in db.query(models.Parcel.id).filter(
+        (models.Parcel.sender_id == user_id) | (models.Parcel.receiver_id == user_id)
+    ).all()]
+
+    if parcel_ids:
+        db.query(models.TrackingEvent).filter(
+            models.TrackingEvent.parcel_id.in_(parcel_ids)
+        ).delete(synchronize_session=False)
+        db.query(models.Parcel).filter(
+            models.Parcel.id.in_(parcel_ids)
+        ).delete(synchronize_session=False)
 
     db.delete(user)
     db.commit()
