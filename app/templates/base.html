@@ -1,89 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Parcel Management System{% endblock %}</title>
-
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Main Styles -->
-    <link rel="stylesheet" href="/static/css/style.css">
-
-    {% block extra_css %}{% endblock %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Parcel Management System{% endblock %}</title>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Redesigned stylesheet -->
+  <link rel="stylesheet" href="static/css/style.css">
+  {% block extracss %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <a href="/" class="navbar-brand">
-            <i class="fas fa-box-open"></i>
-            <span>ParcelMgmt</span>
-        </a>
+  <!-- Preloader -->
+  <div class="preloader" id="preloader"><div class="preloader-spinner"></div></div>
 
-        <ul class="navbar-nav" id="main-nav">
-            <li><a href="/" class="nav-link" data-nav="home"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="/track" class="nav-link" data-nav="track"><i class="fas fa-search-location"></i> Track Parcel</a></li>
-        </ul>
+  <!-- Navigation -->
+  <nav class="navbar" id="main-navbar">
+    <a href="/" class="navbar-brand">
+      <i class="fas fa-box-open"></i>
+      <span>ParcelMgmt</span>
+    </a>
+    <ul class="navbar-nav" id="main-nav">
+      <li><a href="/" class="nav-link" data-nav="home"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="/track" class="nav-link" data-nav="track"><i class="fas fa-search-location"></i> Track Parcel</a></li>
+    </ul>
+    <div class="nav-right" id="auth-nav">
+      <a href="/login" class="btn btn-secondary btn-sm"><i class="fas fa-sign-in-alt"></i> Login</a>
+      <a href="/register" class="btn btn-primary btn-sm"><i class="fas fa-user-plus"></i> Register</a>
+    </div>
+    <button class="mobile-menu-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
 
-        <div class="nav-right" id="auth-nav">
-            <a href="/login" class="btn btn-secondary">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </a>
-            <a href="/register" class="btn btn-primary">
-                <i class="fas fa-user-plus"></i> Register
-            </a>
-        </div>
+  <!-- Main content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
 
-        <button class="mobile-menu-toggle" aria-label="Toggle menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-    </nav>
+  <!-- Toast container -->
+  <div id="global-alert-container" class="alert-container"></div>
 
-    <!-- Main Content -->
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+  <!-- Main JS -->
+  <script src="static/js/main.js"></script>
+  {% block extrajs %}{% endblock %}
 
-    <!-- Alert Container for Toast Notifications -->
-    <div id="global-alert-container" class="alert-container"></div>
-
-    <!-- Main JavaScript -->
-    <script src="/static/js/main.js"></script>
-
-    {% block extra_js %}{% endblock %}
-
-    <!-- Service Worker for PWA capabilities (optional enhancement) -->
-    <script>
-        // Add subtle page transition effect
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.style.opacity = '0';
-            document.body.style.transition = 'opacity 0.3s ease';
-            requestAnimationFrame(() => {
-                document.body.style.opacity = '1';
-            });
-        });
-
-        // Handle mobile menu toggle
-        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-        const navbarNav = document.querySelector('.navbar-nav');
-
-        if (mobileMenuToggle && navbarNav) {
-            mobileMenuToggle.addEventListener('click', () => {
-                mobileMenuToggle.classList.toggle('active');
-                navbarNav.classList.toggle('active');
-            });
+  <script>
+    // Preloader hide
+    window.addEventListener('load', () => {
+      document.getElementById('preloader').classList.add('hidden');
+    });
+    // Navbar scroll shadow
+    const navbar = document.getElementById('main-navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 4);
+    }, {passive:true});
+    // Mobile menu
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    const nav = document.querySelector('.navbar-nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', () => {
+        toggle.classList.toggle('active');
+        nav.classList.toggle('active');
+      });
+      document.addEventListener('click', e => {
+        if (!navbar.contains(e.target)) {
+          toggle.classList.remove('active');
+          nav.classList.remove('active');
         }
-    </script>
+      });
+    }
+    // Page fade-in
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.style.opacity = 0;
+      document.body.style.transition = 'opacity .28s ease';
+      requestAnimationFrame(() => { document.body.style.opacity = 1; });
+    });
+    // Scroll reveal
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.style.animationPlayState = 'running'; });
+    }, {threshold: .12});
+    document.querySelectorAll('.reveal').forEach(el => {
+      el.style.animationPlayState = 'paused';
+      observer.observe(el);
+    });
+  </script>
 </body>
 </html>

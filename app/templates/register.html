@@ -1,310 +1,149 @@
 {% extends "base.html" %}
-
 {% block title %}Register - Parcel Management System{% endblock %}
-
 {% block content %}
-<div class="container" style="max-width: 600px;">
-    <div class="card hover-card" style="margin-top: 2rem; animation: fadeInUp 0.6s ease-out;">
-        <div class="text-center mb-4">
-            <div style="
-                width: 90px;
-                height: 90px;
-                margin: 0 auto 1.5rem;
-                background: linear-gradient(135deg, #10b981, #34d399);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                color: white;
-                box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
-                animation: float 3s ease-in-out infinite;
-            ">
-                <i class="fas fa-user-plus"></i>
-            </div>
-            <h2 style="font-size: 1.75rem; font-weight: 700; color: var(--dark-color); margin-bottom: 0.5rem;">Create Account</h2>
-            <p style="color: var(--secondary-color);">Join us to start sending parcels</p>
-        </div>
-
-        <div id="alert-container"></div>
-
-        <form id="register-form">
-            <!-- Personal Information Section -->
-            <div style="margin-bottom: 2rem;">
-                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <div style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    Personal Information
-                </h3>
-
-                <div class="form-group">
-                    <label class="form-label" for="full_name">Full Name *</label>
-                    <div class="input-icon-wrapper">
-                        <input type="text" class="form-control" id="full_name" name="full_name" required
-                            placeholder="Enter your full name"
-                            style="padding-left: 3rem;">
-                        <i class="fas fa-user" style="left: 1rem; pointer-events: none;"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="username">Username *</label>
-                    <div class="input-icon-wrapper">
-                        <input type="text" class="form-control" id="username" name="username" required
-                            placeholder="Choose a username"
-                            style="padding-left: 3rem;">
-                        <i class="fas fa-at" style="left: 1rem; pointer-events: none;"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="email">Email Address *</label>
-                    <div class="input-icon-wrapper">
-                        <input type="email" class="form-control" id="email" name="email" required
-                            placeholder="Enter your email"
-                            style="padding-left: 3rem;">
-                        <i class="fas fa-envelope" style="left: 1rem; pointer-events: none;"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="phone">Phone Number</label>
-                    <div class="input-icon-wrapper">
-                        <input type="tel" class="form-control" id="phone" name="phone"
-                            placeholder="Enter your phone number"
-                            style="padding-left: 3rem;">
-                        <i class="fas fa-phone" style="left: 1rem; pointer-events: none;"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Address Section -->
-            <div style="margin-bottom: 2rem;">
-                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <div style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </div>
-                    Address
-                </h3>
-
-                <div class="form-group">
-                    <label class="form-label" for="address">Address</label>
-                    <textarea class="form-control" id="address" name="address" rows="3"
-                        placeholder="Enter your address"
-                        style="min-height: 100px;"></textarea>
-                </div>
-            </div>
-
-            <!-- Security Section -->
-            <div style="margin-bottom: 2rem;">
-                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <div style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    Security
-                </h3>
-
-                <div class="form-group">
-                    <label class="form-label" for="password">Password *</label>
-                    <div class="input-icon-wrapper">
-                        <input type="password" class="form-control" id="password" name="password" required
-                            placeholder="Create a password (min 6 characters)"
-                            minlength="6"
-                            style="padding-left: 3rem; padding-right: 3rem;">
-                        <i class="fas fa-lock" style="left: 1rem; pointer-events: none;"></i>
-                        <button type="button" id="toggle-password" style="
-                            position: absolute;
-                            right: 1rem;
-                            top: 50%;
-                            transform: translateY(-50%);
-                            background: none;
-                            border: none;
-                            color: var(--secondary-color);
-                            cursor: pointer;
-                            font-size: 1rem;
-                            transition: color 0.2s;
-                        ">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div id="password-strength" style="margin-top: 0.5rem; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
-                        <div id="password-strength-bar" style="height: 100%; width: 0; background: var(--danger-color); transition: all 0.3s ease;"></div>
-                    </div>
-                    <p id="password-strength-text" style="font-size: 0.8rem; margin-top: 0.25rem; color: var(--secondary-color);">Enter at least 6 characters</p>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
-                <i class="fas fa-user-plus"></i> Create Account
-            </button>
-        </form>
-
-        <div class="text-center mt-4">
-            <p style="color: var(--secondary-color);">
-                Already have an account? <a href="/login" style="color: var(--primary-color); font-weight: 700; text-decoration: none;">Login here</a>
-            </p>
-        </div>
+<div class="container-narrow">
+  <div class="card hover-card reveal" style="margin-top:2rem">
+    <div class="text-center mb-6">
+      <div style="width:80px;height:80px;margin:0 auto var(--s5);border-radius:1.4rem;background:linear-gradient(135deg,#1a9c68,#4dd8a0);display:grid;place-items:center;font-size:2.2rem;color:#fff;box-shadow:0 12px 28px rgba(26,156,104,.28);animation:floaty 5s ease-in-out infinite">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <h2 style="font-size:var(--text-xl);font-weight:900;margin-bottom:.3rem">Create Account</h2>
+      <p style="color:var(--text-muted)">Join us to start sending parcels</p>
     </div>
+
+    <div id="alert-container"></div>
+
+    <form id="register-form">
+      <!-- Personal Info -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <div class="section-icon teal"><i class="fas fa-user"></i></div>
+          Personal Information
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="fullname">Full Name</label>
+          <div class="input-icon-wrapper">
+            <input type="text" class="form-control" id="fullname" name="fullname" required placeholder="Enter your full name">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="username">Username</label>
+          <div class="input-icon-wrapper">
+            <input type="text" class="form-control" id="username" name="username" required placeholder="Choose a username">
+            <i class="fas fa-at"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-icon-wrapper">
+            <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email">
+            <i class="fas fa-envelope"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number</label>
+          <div class="input-icon-wrapper">
+            <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter your phone number">
+            <i class="fas fa-phone"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <div class="section-icon amber"><i class="fas fa-map-marker-alt"></i></div>
+          Address
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="address">Address</label>
+          <div class="input-icon-wrapper">
+            <textarea class="form-control" id="address" name="address" rows="3" placeholder="Enter your address" style="padding-left:2.9rem;padding-top:1rem"></textarea>
+            <i class="fas fa-map-marker-alt" style="top:1.2rem;transform:none"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security -->
+      <div class="form-section">
+        <div class="form-section-title">
+          <div class="section-icon green"><i class="fas fa-shield-alt"></i></div>
+          Security
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-icon-wrapper">
+            <input type="password" class="form-control" id="password" name="password" required placeholder="Create a password (min 6 chars)" minlength="6" style="padding-left:2.9rem;padding-right:3rem">
+            <i class="fas fa-lock"></i>
+            <button type="button" id="toggle-password" aria-label="Toggle password"><i class="fas fa-eye"></i></button>
+          </div>
+          <div class="password-strength-bar"><div class="password-strength-bar-fill" id="psb"></div></div>
+          <p id="pst" style="font-size:var(--text-xs);color:var(--text-muted);margin-top:.3rem">Enter at least 6 characters</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="confirm-password">Confirm Password</label>
+          <div class="input-icon-wrapper">
+            <input type="password" class="form-control" id="confirm-password" name="confirm-password" required placeholder="Repeat your password" style="padding-left:2.9rem">
+            <i class="fas fa-lock"></i>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-full btn-lg">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <div class="text-center mt-6" style="font-size:var(--text-sm)">
+      <span style="color:var(--text-muted)">Already have an account? </span>
+      <a href="/login" style="color:var(--primary);font-weight:700">Login</a>
+    </div>
+  </div>
 </div>
-
-<style>
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-#register-form .form-group {
-    animation: fadeInUp 0.5s ease-out backwards;
-}
-
-#register-form .form-group:nth-child(1) { animation-delay: 0.05s; }
-#register-form .form-group:nth-child(2) { animation-delay: 0.1s; }
-#register-form .form-group:nth-child(3) { animation-delay: 0.15s; }
-#register-form .form-group:nth-child(4) { animation-delay: 0.2s; }
-#register-form .form-group:nth-child(5) { animation-delay: 0.25s; }
-#register-form .form-group:nth-child(6) { animation-delay: 0.3s; }
-</style>
 {% endblock %}
-
-{% block extra_js %}
+{% block extrajs %}
 <script>
-// Toggle password visibility
-const togglePassword = document.getElementById('toggle-password');
-const passwordInput = document.getElementById('password');
-
-if (togglePassword && passwordInput) {
-    togglePassword.addEventListener('click', () => {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        togglePassword.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-    });
-}
-
-// Password strength indicator
-const passwordStrengthBar = document.getElementById('password-strength-bar');
-const passwordStrengthText = document.getElementById('password-strength-text');
-
-passwordInput.addEventListener('input', (e) => {
-    const password = e.target.value;
-    let strength = 0;
-
-    if (password.length >= 6) strength += 25;
-    if (password.length >= 8) strength += 25;
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 25;
-    if (/[0-9]/.test(password) && /[^a-zA-Z0-9]/.test(password)) strength += 25;
-
-    passwordStrengthBar.style.width = strength + '%';
-
-    if (strength <= 25) {
-        passwordStrengthBar.style.background = 'var(--danger-color)';
-        passwordStrengthText.textContent = 'Weak password';
-        passwordStrengthText.style.color = 'var(--danger-color)';
-    } else if (strength <= 50) {
-        passwordStrengthBar.style.background = 'var(--warning-color)';
-        passwordStrengthText.textContent = 'Fair password';
-        passwordStrengthText.style.color = 'var(--warning-color)';
-    } else if (strength <= 75) {
-        passwordStrengthBar.style.background = 'var(--info-color)';
-        passwordStrengthText.textContent = 'Good password';
-        passwordStrengthText.style.color = 'var(--info-color)';
-    } else {
-        passwordStrengthBar.style.background = 'var(--success-color)';
-        passwordStrengthText.textContent = 'Strong password';
-        passwordStrengthText.style.color = 'var(--success-color)';
-    }
+const tp = document.getElementById('toggle-password');
+const pi = document.getElementById('password');
+tp.addEventListener('click', () => {
+  const t = pi.type === 'password' ? 'text' : 'password';
+  pi.type = t;
+  tp.innerHTML = t === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
 });
-
-// Form submission
-document.getElementById('register-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.target);
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalBtnContent = submitBtn.innerHTML;
-
-    // Show loading state
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
-    submitBtn.disabled = true;
-
-    const data = {
-        full_name: formData.get('full_name'),
-        username: formData.get('username'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-        password: formData.get('password'),
-        address: formData.get('address'),
-        role: 'customer'
-    };
-
-    try {
-        const response = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            showAlert('Account created successfully! Redirecting to login...', 'success');
-
-            // Animate and redirect
-            setTimeout(() => {
-                document.body.style.opacity = '0';
-                document.body.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 300);
-            }, 1500);
-        } else {
-            showAlert(result.detail || 'Registration failed. Please try again.', 'error');
-            submitBtn.innerHTML = originalBtnContent;
-            submitBtn.disabled = false;
-        }
-    } catch (error) {
-        console.error('Registration error:', error);
-        showAlert('An error occurred. Please try again.', 'error');
-        submitBtn.innerHTML = originalBtnContent;
-        submitBtn.disabled = false;
-    }
+pi.addEventListener('input', () => {
+  const p = pi.value, bar = document.getElementById('psb'), txt = document.getElementById('pst');
+  let s = 0;
+  if (p.length >= 6) s += 25;
+  if (p.length >= 8) s += 25;
+  if (/[a-z]/.test(p) && /[A-Z]/.test(p)) s += 25;
+  if (/[0-9]/.test(p) && /[^a-zA-Z0-9]/.test(p)) s += 25;
+  const colors = ['','#d15656','#d4891a','var(--info)','var(--success)'];
+  const labels = ['','Weak','Fair','Good','Strong'];
+  const i = Math.ceil(s / 25);
+  bar.style.width = s + '%';
+  bar.style.background = colors[i] || '';
+  txt.textContent = i ? labels[i] + ' password' : 'Enter at least 6 characters';
+  txt.style.color = colors[i] || 'var(--text-muted)';
 });
-
-function showAlert(message, type) {
-    const container = document.getElementById('alert-container');
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.style.animation = 'fadeInUp 0.4s ease-out';
-    alert.innerHTML = message;
-
-    container.innerHTML = '';
-    container.appendChild(alert);
-
-    setTimeout(() => {
-        alert.style.animation = 'fadeOut 0.4s ease-out forwards';
-        setTimeout(() => alert.remove(), 400);
-    }, 5000);
-}
-
-// Add fadeOut keyframes if not present
-if (!document.getElementById('fadeOut-style')) {
-    const style = document.createElement('style');
-    style.id = 'fadeOut-style';
-    style.textContent = `
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-10px); }
-        }
-    `;
-    document.head.appendChild(style);
+document.getElementById('register-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const btn = e.target.querySelector('button[type=submit]');
+  const orig = btn.innerHTML;
+  if (fd.get('password') !== fd.get('confirm-password')) { showAlert('Passwords do not match.', 'error'); return; }
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account…'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/auth/register', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(Object.fromEntries(fd))});
+    const r = await res.json();
+    if (res.ok) { showAlert('Account created! Redirecting to login…', 'success'); setTimeout(() => window.location.href = '/login', 1500); }
+    else { showAlert(r.detail || 'Registration failed.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
+  } catch { showAlert('An error occurred.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
+});
+function showAlert(msg, type) {
+  const c = document.getElementById('alert-container');
+  c.innerHTML = `<div class="alert alert-${type}" style="margin-bottom:1rem">${msg}</div>`;
+  setTimeout(() => c.innerHTML = '', 5000);
 }
 </script>
 {% endblock %}

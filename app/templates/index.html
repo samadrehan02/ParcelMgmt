@@ -1,149 +1,113 @@
 {% extends "base.html" %}
-
+{% block title %}Home - Parcel Management System{% endblock %}
 {% block content %}
-<!-- Hero Section -->
-<section class="hero">
-    <div class="hero-content">
-        <div class="hero-icon">
-            <i class="fas fa-shipping-fast"></i>
-        </div>
-        <h1>Welcome to <span class="gradient-text">Parcel Management System</span></h1>
-        <p>Send, track, and manage your parcels with ease. Your trusted partner for reliable parcel delivery services with real-time tracking and secure handling.</p>
 
-        <div class="hero-actions">
-            <a href="/track" class="btn btn-secondary btn-lg">
-                <i class="fas fa-search-location"></i> Track Parcel
-            </a>
-            <a href="/register" class="btn btn-primary btn-lg">
-                <i class="fas fa-rocket"></i> Get Started
-            </a>
-        </div>
+<section class="hero container">
+  <div class="hero-content">
+    <div class="hero-icon"><i class="fas fa-shipping-fast"></i></div>
+    <h1>Welcome to <span class="gradient-text">ParcelMgmt</span></h1>
+    <p>Send, track, and manage your parcels with ease. Real-time tracking, secure handling, and reliable delivery — all in one place.</p>
+    <div class="hero-actions">
+      <a href="/register" class="btn btn-primary btn-lg"><i class="fas fa-rocket"></i> Get Started</a>
+      <a href="/track" class="btn btn-secondary btn-lg"><i class="fas fa-search-location"></i> Track a Parcel</a>
     </div>
+  </div>
 </section>
 
-<!-- Features Section -->
 <div class="container">
-    <div class="text-center mb-5" style="margin-bottom: 3rem;">
-        <h2 class="reveal" style="font-size: 2.5rem; font-weight: 800; color: var(--dark-color); margin-bottom: 1rem;">
-            Our Services
-        </h2>
-        <p class="reveal" style="color: var(--secondary-color); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
-            Experience seamless parcel management with our comprehensive suite of services
-        </p>
+  <!-- Services -->
+  <div style="text-align:center;margin-bottom:2rem" class="reveal">
+    <h2 style="font-size:var(--text-2xl);margin-bottom:.5rem">Our Services</h2>
+    <p style="color:var(--text-muted);margin-inline:auto">Everything you need for seamless parcel delivery</p>
+  </div>
+  <div class="service-cards stagger-children">
+    <div class="service-card">
+      <div class="service-card-icon blue"><i class="fas fa-shipping-fast"></i></div>
+      <h3>Fast Delivery</h3>
+      <p>Quick and reliable delivery to your doorstep. On time, every time.</p>
     </div>
-
-    <div class="service-cards stagger-children">
-        <!-- Fast Delivery Card -->
-        <div class="service-card reveal">
-            <div class="service-card-icon blue">
-                <i class="fas fa-shipping-fast"></i>
-            </div>
-            <h3>Fast Delivery</h3>
-            <p>Quick and reliable delivery to your doorstep. We ensure your parcels reach their destination on time, every time.</p>
-        </div>
-
-        <!-- Real-time Tracking Card -->
-        <div class="service-card reveal">
-            <div class="service-card-icon green">
-                <i class="fas fa-map-marker-alt"></i>
-            </div>
-            <h3>Real-time Tracking</h3>
-            <p>Track your parcel at every step of the journey. Get instant updates on your shipment's location and status.</p>
-        </div>
-
-        <!-- Secure Handling Card -->
-        <div class="service-card reveal">
-            <div class="service-card-icon orange">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            <h3>Secure Handling</h3>
-            <p>Your parcels are safe with us. We use advanced security measures to ensure your items are protected throughout transit.</p>
-        </div>
+    <div class="service-card">
+      <div class="service-card-icon green"><i class="fas fa-map-marker-alt"></i></div>
+      <h3>Real-time Tracking</h3>
+      <p>Track your parcel at every step of the journey with instant updates.</p>
     </div>
-
-    <!-- Stats Section -->
-    <div class="card reveal" style="margin-top: 4rem; text-align: center;">
-        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: var(--dark-color);">
-            Trusted by Thousands
-        </h3>
-
-        <div class="stats-grid compact" style="margin: 0;">
-            <div class="stat-card" style="cursor: default;">
-                <div class="stat-icon blue">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="stat-info">
-                    <h3 data-counter="50000" data-suffix="+">0</h3>
-                    <p>Parcels Delivered</p>
-                </div>
-            </div>
-
-            <div class="stat-card" style="cursor: default;">
-                <div class="stat-icon green">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="stat-info">
-                    <h3 data-counter="10000" data-suffix="+">0</h3>
-                    <p>Happy Customers</p>
-                </div>
-            </div>
-
-            <div class="stat-card" style="cursor: default;">
-                <div class="stat-icon purple">
-                    <i class="fas fa-star"></i>
-                </div>
-                <div class="stat-info">
-                    <h3 data-counter="99" data-suffix="%">0</h3>
-                    <p>Satisfaction Rate</p>
-                </div>
-            </div>
-
-            <div class="stat-card" style="cursor: default;">
-                <div class="stat-icon orange">
-                    <i class="fas fa-globe"></i>
-                </div>
-                <div class="stat-info">
-                    <h3 data-counter="150" data-suffix="+">0</h3>
-                    <p>Cities Covered</p>
-                </div>
-            </div>
-        </div>
+    <div class="service-card">
+      <div class="service-card-icon orange"><i class="fas fa-shield-alt"></i></div>
+      <h3>Secure Handling</h3>
+      <p>Advanced security measures to protect your items throughout transit.</p>
     </div>
+  </div>
 
-    <!-- CTA Section -->
-    <div class="card reveal" style="margin-top: 3rem; background: var(--primary-gradient); color: white; text-align: center;">
-        <h3 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem;">Ready to Send Your First Parcel?</h3>
-        <p style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 1.5rem;">Join thousands of satisfied customers and experience hassle-free parcel delivery.</p>
-
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <a href="/register" class="btn" style="background: white; color: var(--primary-color);">
-                <i class="fas fa-user-plus"></i> Create Free Account
-            </a>
-            <a href="/track" class="btn btn-secondary" style="background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.3);">
-                <i class="fas fa-search"></i> Track a Parcel
-            </a>
-        </div>
+  <!-- Stats -->
+  <div class="card reveal" style="margin-top:2.5rem;text-align:center">
+    <h3 style="font-size:var(--text-xl);margin-bottom:1.5rem">Trusted by Thousands</h3>
+    <div class="stats-grid compact stagger-children" style="margin:0">
+      <div class="stat-card" style="cursor:default">
+        <div class="stat-icon blue"><i class="fas fa-box"></i></div>
+        <div class="stat-info"><h3 data-counter="50000" data-suffix="+">0</h3><p>Parcels Delivered</p></div>
+      </div>
+      <div class="stat-card" style="cursor:default">
+        <div class="stat-icon green"><i class="fas fa-users"></i></div>
+        <div class="stat-info"><h3 data-counter="10000" data-suffix="+">0</h3><p>Happy Customers</p></div>
+      </div>
+      <div class="stat-card" style="cursor:default">
+        <div class="stat-icon purple"><i class="fas fa-star"></i></div>
+        <div class="stat-info"><h3 data-counter="99" data-suffix="%">0</h3><p>Satisfaction Rate</p></div>
+      </div>
+      <div class="stat-card" style="cursor:default">
+        <div class="stat-icon orange"><i class="fas fa-globe"></i></div>
+        <div class="stat-info"><h3 data-counter="150" data-suffix="+">0</h3><p>Cities Covered</p></div>
+      </div>
     </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="card reveal" style="margin-top:2rem;text-align:center;background:linear-gradient(135deg,#0e8a8c,#2d78f2);border:none;color:#fff">
+    <h3 style="font-size:var(--text-xl);margin-bottom:.6rem;color:#fff">Ready to Send Your First Parcel?</h3>
+    <p style="color:rgba(255,255,255,.8);margin:0 auto 1.5rem">Join thousands of satisfied customers.</p>
+    <div class="hero-actions" style="justify-content:center">
+      <a href="/register" class="btn" style="background:#fff;color:var(--primary)"><i class="fas fa-user-plus"></i> Create Free Account</a>
+      <a href="/track" class="btn" style="background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.35)"><i class="fas fa-search"></i> Track a Parcel</a>
+    </div>
+  </div>
 </div>
 
 <!-- Footer -->
-<footer style="background: var(--dark-color); color: white; padding: 3rem 2rem; margin-top: 4rem;">
-    <div class="container" style="text-align: center;">
-        <div style="margin-bottom: 1.5rem;">
-            <i class="fas fa-box-open" style="font-size: 3rem; color: var(--primary-light);"></i>
-        </div>
-        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">ParcelMgmt</h3>
-        <p style="color: var(--secondary-light); margin-bottom: 1.5rem;">Your trusted partner for parcel delivery services</p>
-
-        <div style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
-            <a href="#" style="color: white; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='var(--primary-light)'" onmouseout="this.style.color='white'"><i class="fab fa-facebook"></i></a>
-            <a href="#" style="color: white; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='var(--primary-light)'" onmouseout="this.style.color='white'"><i class="fab fa-twitter"></i></a>
-            <a href="#" style="color: white; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='var(--primary-light)'" onmouseout="this.style.color='white'"><i class="fab fa-instagram"></i></a>
-            <a href="#" style="color: white; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='var(--primary-light)'" onmouseout="this.style.color='white'"><i class="fab fa-linkedin"></i></a>
-        </div>
-
-        <p style="color: var(--secondary-color); font-size: 0.9rem;">&copy; 2026 Parcel Management System. All rights reserved.</p>
+<footer>
+  <div class="footer-inner">
+    <div>
+      <h3><i class="fas fa-box-open" style="color:var(--primary);margin-right:.5rem"></i>ParcelMgmt</h3>
+      <p>Your trusted partner for parcel delivery services.</p>
     </div>
+    <div>
+      <h3>Quick Links</h3>
+      <p><a href="/track">Track Parcel</a></p>
+      <p><a href="/register">Create Account</a></p>
+      <p><a href="/login">Login</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Parcel Management System. All rights reserved.</div>
 </footer>
 
+{% endblock %}
+{% block extrajs %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const counters = document.querySelectorAll('[data-counter]');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target, target = +el.dataset.counter, suffix = el.dataset.suffix || '';
+      let start = 0, duration = 1400, step = target / (duration / 16);
+      const t = setInterval(() => {
+        start = Math.min(start + step, target);
+        el.textContent = Math.floor(start).toLocaleString() + suffix;
+        if (start >= target) clearInterval(t);
+      }, 16);
+      io.unobserve(el);
+    });
+  }, {threshold:.5});
+  counters.forEach(c => io.observe(c));
+});
+</script>
 {% endblock %}

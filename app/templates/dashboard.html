@@ -1,293 +1,108 @@
 {% extends "base.html" %}
-
 {% block title %}Dashboard - Parcel Management System{% endblock %}
-
 {% block content %}
 <div class="container">
-    <!-- Welcome Card -->
-    <div class="card reveal">
-        <div class="card-header">
-            <div>
-                <h1 class="card-title">
-                    <i class="fas fa-hand-wave" style="color: var(--warning-color);"></i>
-                    Welcome back, <span id="user-name" style="color: var(--primary-color);">User</span>!
-                </h1>
-                <p class="card-subtitle">Manage your parcels and track deliveries</p>
-            </div>
-            <a href="/create-parcel" class="btn btn-primary">
-                <i class="fas fa-plus"></i> New Parcel
-            </a>
-        </div>
+  <!-- Welcome -->
+  <div class="card reveal">
+    <div class="card-header">
+      <div>
+        <h1 class="card-title"><i class="fas fa-hand-wave"></i> Welcome back, <span id="user-name" style="color:var(--primary)">User</span>!</h1>
+        <p class="card-subtitle">Manage your parcels and track deliveries</p>
+      </div>
+      <a href="/create-parcel" class="btn btn-primary"><i class="fas fa-plus"></i> New Parcel</a>
     </div>
+  </div>
 
-    <!-- Quick Actions -->
-    <div class="stats-grid reveal">
-        <a href="/create-parcel" class="stat-card hover-card">
-            <div class="stat-icon blue">
-                <i class="fas fa-plus"></i>
-            </div>
-            <div class="stat-info">
-                <h3 style="font-size: 1.25rem;">Send Parcel</h3>
-                <p>Create a new shipment</p>
-            </div>
-            <i class="fas fa-arrow-right" style="margin-left: auto; color: var(--secondary-color); opacity: 0.5;"></i>
-        </a>
+  <!-- Quick Actions -->
+  <div class="stats-grid stagger-children" style="margin-top:1rem">
+    <a href="/create-parcel" class="stat-card hover-card" style="text-decoration:none">
+      <div class="stat-icon blue"><i class="fas fa-plus"></i></div>
+      <div class="stat-info"><h3 style="font-size:1.15rem">Send Parcel</h3><p>Create a new shipment</p></div>
+      <i class="fas fa-arrow-right" style="margin-left:auto;color:var(--text-faint)"></i>
+    </a>
+    <a href="/my-parcels" class="stat-card hover-card" style="text-decoration:none">
+      <div class="stat-icon green"><i class="fas fa-box"></i></div>
+      <div class="stat-info"><h3 style="font-size:1.15rem">My Parcels</h3><p>View all your parcels</p></div>
+      <i class="fas fa-arrow-right" style="margin-left:auto;color:var(--text-faint)"></i>
+    </a>
+    <a href="/track" class="stat-card hover-card" style="text-decoration:none">
+      <div class="stat-icon orange"><i class="fas fa-search-location"></i></div>
+      <div class="stat-info"><h3 style="font-size:1.15rem">Track</h3><p>Track any parcel</p></div>
+      <i class="fas fa-arrow-right" style="margin-left:auto;color:var(--text-faint)"></i>
+    </a>
+  </div>
 
-        <a href="/my-parcels" class="stat-card hover-card">
-            <div class="stat-icon green">
-                <i class="fas fa-box"></i>
-            </div>
-            <div class="stat-info">
-                <h3 style="font-size: 1.25rem;">My Parcels</h3>
-                <p>View all your parcels</p>
-            </div>
-            <i class="fas fa-arrow-right" style="margin-left: auto; color: var(--secondary-color); opacity: 0.5;"></i>
-        </a>
-
-        <a href="/track" class="stat-card hover-card">
-            <div class="stat-icon orange">
-                <i class="fas fa-search-location"></i>
-            </div>
-            <div class="stat-info">
-                <h3 style="font-size: 1.25rem;">Track</h3>
-                <p>Track any parcel</p>
-            </div>
-            <i class="fas fa-arrow-right" style="margin-left: auto; color: var(--secondary-color); opacity: 0.5;"></i>
-        </a>
+  <!-- Recent Parcels -->
+  <div class="card reveal" style="margin-top:1rem">
+    <div class="card-header">
+      <h2 class="card-title"><i class="fas fa-clock"></i> Recent Parcels</h2>
+      <a href="/my-parcels" class="btn btn-secondary btn-sm"><i class="fas fa-list"></i> View All</a>
     </div>
-
-    <!-- Recent Parcels -->
-    <div class="card reveal">
-        <div class="card-header">
-            <h2 class="card-title">
-                <i class="fas fa-clock"></i> Recent Parcels
-            </h2>
-            <a href="/my-parcels" class="btn btn-secondary">
-                <i class="fas fa-list"></i> View All
-            </a>
-        </div>
-
-        <div id="recent-parcels-container">
-            <div class="loading-pulse" style="padding: 3rem;">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <p style="text-align: center; color: var(--secondary-color);">Loading your parcels...</p>
-        </div>
+    <div id="recent-parcels-container">
+      <div class="loading-pulse"><span></span><span></span><span></span></div>
     </div>
+  </div>
 
-    <!-- Tips Section -->
-    <div class="card reveal" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));">
-        <div class="card-header">
-            <h2 class="card-title">
-                <i class="fas fa-lightbulb" style="color: var(--warning-color);"></i> Quick Tips
-            </h2>
-        </div>
-
-        <div style="display: grid; gap: 1rem;">
-            <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: white; border-radius: 0.75rem;">
-                <div style="width: 40px; height: 40px; background: var(--success-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="fas fa-check" style="color: var(--success-color);"></i>
-                </div>
-                <div>
-                    <h4 style="font-weight: 600; margin-bottom: 0.25rem;">Track Your Parcels</h4>
-                    <p style="color: var(--secondary-color); font-size: 0.9rem;">Use the tracking feature to monitor your parcel's journey in real-time.</p>
-                </div>
-            </div>
-
-            <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: white; border-radius: 0.75rem;">
-                <div style="width: 40px; height: 40px; background: var(--info-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="fas fa-bell" style="color: var(--info-color);"></i>
-                </div>
-                <div>
-                    <h4 style="font-weight: 600; margin-bottom: 0.25rem;">Stay Updated</h4>
-                    <p style="color: var(--secondary-color); font-size: 0.9rem;">Check your parcel status regularly for the latest updates on delivery.</p>
-                </div>
-            </div>
-
-            <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: white; border-radius: 0.75rem;">
-                <div style="width: 40px; height: 40px; background: var(--warning-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="fas fa-shield-alt" style="color: var(--warning-color);"></i>
-                </div>
-                <div>
-                    <h4 style="font-weight: 600; margin-bottom: 0.25rem;">Secure Shipping</h4>
-                    <p style="color: var(--secondary-color); font-size: 0.9rem;">Always double-check addresses to ensure safe and accurate delivery.</p>
-                </div>
-            </div>
-        </div>
+  <!-- Tips -->
+  <div class="card reveal" style="margin-top:1rem">
+    <div class="card-header"><h2 class="card-title"><i class="fas fa-lightbulb" style="color:var(--warning)"></i> Quick Tips</h2></div>
+    <div class="grid-2">
+      <div class="info-item">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem"><i class="fas fa-check" style="color:var(--success)"></i><strong>Track Your Parcels</strong></div>
+        <p style="color:var(--text-muted);font-size:var(--text-sm)">Use the tracking feature to monitor your parcel's journey in real-time.</p>
+      </div>
+      <div class="info-item">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem"><i class="fas fa-bell" style="color:var(--info)"></i><strong>Stay Updated</strong></div>
+        <p style="color:var(--text-muted);font-size:var(--text-sm)">Check your parcel status regularly for the latest delivery updates.</p>
+      </div>
+      <div class="info-item">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem"><i class="fas fa-shield-alt" style="color:var(--warning)"></i><strong>Secure Shipping</strong></div>
+        <p style="color:var(--text-muted);font-size:var(--text-sm)">Always double-check addresses to ensure safe and accurate delivery.</p>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}
-
-{% block extra_js %}
+{% block extrajs %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    loadUserInfo();
-    loadRecentParcels();
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (user.fullname) {
+    const el = document.getElementById('user-name');
+    el.textContent = user.fullname;
+    el.style.animation = 'countUp .5s ease';
+  }
+  loadRecentParcels();
 });
 
-function loadUserInfo() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user.full_name) {
-        const userNameEl = document.getElementById('user-name');
-        userNameEl.textContent = user.full_name;
-        userNameEl.style.opacity = '0';
-        userNameEl.style.transform = 'translateY(10px)';
-        userNameEl.style.transition = 'all 0.5s ease';
-
-        requestAnimationFrame(() => {
-            userNameEl.style.opacity = '1';
-            userNameEl.style.transform = 'translateY(0)';
-        });
-    }
-}
-
 async function loadRecentParcels() {
-    const token = localStorage.getItem('token');
-    const container = document.getElementById('recent-parcels-container');
-
-    if (!token) {
-        window.location.href = '/login';
-        return;
-    }
-
-    try {
-        const response = await fetch('/api/parcels/my-parcels', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (response.ok) {
-            const parcels = await response.json();
-            displayRecentParcels(parcels.slice(0, 5));
-        } else if (response.status === 401) {
-            window.location.href = '/login';
-        } else {
-            throw new Error('Failed to load parcels');
-        }
-    } catch (error) {
-        console.error('Error loading parcels:', error);
-        container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-exclamation-circle empty-state-icon" style="font-size: 3rem; color: var(--danger-color);"></i>
-                <h3>Failed to load parcels</h3>
-                <p>Please try again later</p>
-                <button class="btn btn-primary mt-2" onclick="loadRecentParcels()">
-                    <i class="fas fa-sync"></i> Retry
-                </button>
-            </div>
-        `;
-    }
+  const token = localStorage.getItem('token');
+  const c = document.getElementById('recent-parcels-container');
+  if (!token) { window.location.href = '/login'; return; }
+  try {
+    const res = await fetch('/api/parcels/my-parcels', {headers:{Authorization:'Bearer '+token}});
+    if (res.ok) {
+      const parcels = await res.json();
+      displayParcels(parcels.slice(0, 5));
+    } else if (res.status === 401) { window.location.href = '/login'; }
+    else throw new Error();
+  } catch {
+    c.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle empty-state-icon" style="color:var(--danger)"></i><h3>Failed to load parcels</h3><p>Please try again later</p><button class="btn btn-primary mt-4" onclick="loadRecentParcels()"><i class="fas fa-sync"></i> Retry</button></div>`;
+  }
 }
 
-function displayRecentParcels(parcels) {
-    const container = document.getElementById('recent-parcels-container');
-
-    if (parcels.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state" style="padding: 3rem;">
-                <i class="fas fa-box-open empty-state-icon"></i>
-                <h3>No parcels yet</h3>
-                <p>You haven't sent or received any parcels yet</p>
-                <a href="/create-parcel" class="btn btn-primary mt-2">Send Your First Parcel</a>
-            </div>
-        `;
-        return;
-    }
-
-    const html = `
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Tracking #</th>
-                        <th>Status</th>
-                        <th>Weight</th>
-                        <th>Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${parcels.map((parcel, index) => `
-                        <tr style="animation: slideInRight 0.4s ease-out ${index * 0.1}s backwards;">
-                            <td>
-                                <strong style="font-family: var(--font-mono);">${parcel.tracking_number}</strong>
-                            </td>
-                            <td>
-                                <span class="badge badge-${parcel.status}">
-                                    <i class="fas ${getStatusIcon(parcel.status)}"></i>
-                                    ${formatStatus(parcel.status)}
-                                </span>
-                            </td>
-                            <td>${parcel.weight} kg</td>
-                            <td>${formatDate(parcel.created_at)}</td>
-                            <td>
-                                <a href="/track?number=${parcel.tracking_number}" class="btn btn-secondary btn-sm"
-                                    style="padding: 0.5rem 1rem;">
-                                    <i class="fas fa-eye"></i> View
-                                </a>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    container.innerHTML = html;
+function displayParcels(parcels) {
+  const c = document.getElementById('recent-parcels-container');
+  if (!parcels.length) {
+    c.innerHTML = `<div class="empty-state"><i class="fas fa-box-open empty-state-icon"></i><h3>No parcels yet</h3><p>You haven't sent or received any parcels yet</p><a href="/create-parcel" class="btn btn-primary mt-4">Send Your First Parcel</a></div>`;
+    return;
+  }
+  c.innerHTML = `<div class="table-container"><table class="table"><thead><tr><th>Tracking</th><th>Status</th><th>Weight</th><th>Date</th><th>Action</th></tr></thead><tbody>
+${parcels.map((p,i) => `<tr style="animation:fadeSlideIn .4s ${i*.07}s both"><td><span class="font-mono">${p.trackingnumber}</span></td><td><span class="badge badge-${p.status}"><i class="fas ${statusIcon(p.status)}"></i> ${statusLabel(p.status)}</span></td><td>${p.weight} kg</td><td>${fmtDate(p.createdat)}</td><td><a href="/track?number=${p.trackingnumber}" class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i> View</a></td></tr>`).join('')}
+</tbody></table></div>`;
 }
-
-function getStatusIcon(status) {
-    const icons = {
-        'pending': 'fa-clock',
-        'picked_up': 'fa-hand-holding',
-        'in_transit': 'fa-truck',
-        'out_for_delivery': 'fa-shipping-fast',
-        'delivered': 'fa-check-circle',
-        'cancelled': 'fa-times-circle'
-    };
-    return icons[status] || 'fa-circle';
-}
-
-function formatStatus(status) {
-    const statusMap = {
-        'pending': 'Pending',
-        'picked_up': 'Picked Up',
-        'in_transit': 'In Transit',
-        'out_for_delivery': 'Out for Delivery',
-        'delivered': 'Delivered',
-        'cancelled': 'Cancelled'
-    };
-    return statusMap[status] || status;
-}
-
-function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
-}
-
-// Add slideInRight keyframes
-if (!document.getElementById('slideInRight-style')) {
-    const style = document.createElement('style');
-    style.id = 'slideInRight-style';
-    style.textContent = `
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-    `;
-    document.head.appendChild(style);
-}
+const statusIcon = s => ({pending:'fa-clock',pickedup:'fa-hand-holding',intransit:'fa-truck',outfordelivery:'fa-shipping-fast',delivered:'fa-check-circle',cancelled:'fa-times-circle'}[s]||'fa-circle');
+const statusLabel = s => ({pending:'Pending',pickedup:'Picked Up',intransit:'In Transit',outfordelivery:'Out for Delivery',delivered:'Delivered',cancelled:'Cancelled'}[s]||s);
+const fmtDate = d => new Date(d).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
 </script>
 {% endblock %}

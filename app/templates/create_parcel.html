@@ -1,319 +1,177 @@
 {% extends "base.html" %}
-
 {% block title %}Create Parcel - Parcel Management System{% endblock %}
-
 {% block content %}
-<div class="container" style="max-width: 900px;">
-    <!-- Header -->
-    <div class="card reveal" style="margin-top: 2rem;">
-        <div class="card-header" style="flex-wrap: wrap; gap: 1rem;">
-            <div>
-                <h1 class="card-title">
-                    <i class="fas fa-plus-circle" style="color: var(--success-color);"></i> Create New Parcel
-                </h1>
-                <p class="card-subtitle">Fill in the details to send a new parcel</p>
-            </div>
-            <a href="/my-parcels" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Parcels
-            </a>
+<div class="container" style="max-width:860px">
+  <div class="card reveal" style="margin-top:1rem">
+    <div class="card-header">
+      <div>
+        <h1 class="card-title"><i class="fas fa-plus-circle" style="color:var(--success)"></i> Create New Parcel</h1>
+        <p class="card-subtitle">Fill in the details to send a new parcel</p>
+      </div>
+      <a href="/my-parcels" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+  </div>
+
+  <div id="alert-container" style="margin-top:.75rem"></div>
+
+  <form id="create-parcel-form">
+    <!-- Receiver Information -->
+    <div class="card reveal" style="margin-top:1rem">
+      <div class="form-section-title" style="margin-bottom:var(--s5)">
+        <div class="section-icon teal"><i class="fas fa-user"></i></div>
+        Receiver Information
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="receiverid">Select Receiver</label>
+        <div class="input-icon-wrapper">
+          <select class="form-control" id="receiverid" name="receiverid" required>
+            <option value="">— Select a user —</option>
+          </select>
+          <i class="fas fa-users"></i>
         </div>
+        <p class="form-text"><i class="fas fa-info-circle"></i> The receiver must be a registered user</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="deliveryaddress">Delivery Address</label>
+        <div class="input-icon-wrapper">
+          <textarea class="form-control" id="deliveryaddress" name="deliveryaddress" rows="3" required placeholder="Enter the complete delivery address including city, state, and ZIP code" style="padding-left:2.9rem;padding-top:1rem"></textarea>
+          <i class="fas fa-map-marker-alt" style="top:1.15rem;transform:none"></i>
+        </div>
+      </div>
     </div>
 
-    <form id="create-parcel-form">
-        <!-- Receiver Information -->
-        <div class="card reveal" style="margin-top: 1.5rem; animation-delay: 0.1s;">
-            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
-                    <i class="fas fa-user"></i>
-                </div>
-                Receiver Information
-            </h3>
-
-            <div class="form-group">
-                <label class="form-label" for="receiver_id">Select Receiver *</label>
-                <div class="input-icon-wrapper">
-                    <select class="form-control" id="receiver_id" name="receiver_id" required style="padding-left: 3rem; appearance: auto;">
-                        <option value="">-- Select a user --</option>
-                    </select>
-                    <i class="fas fa-users" style="left: 1rem;"></i>
-                </div>
-                <small class="form-text"><i class="fas fa-info-circle"></i> The receiver must be a registered user</small>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="delivery_address">Delivery Address *</label>
-                <div class="input-icon-wrapper">
-                    <textarea class="form-control" id="delivery_address" name="delivery_address" rows="3" required
-                        placeholder="Enter the complete delivery address including city, state, and ZIP code"
-                        style="padding-left: 3rem; min-height: 100px;"></textarea>
-                    <i class="fas fa-map-marker-alt" style="left: 1rem; top: 1.5rem;"></i>
-                </div>
-            </div>
+    <!-- Parcel Details -->
+    <div class="card reveal" style="margin-top:1rem">
+      <div class="form-section-title" style="margin-bottom:var(--s5)">
+        <div class="section-icon amber"><i class="fas fa-box"></i></div>
+        Parcel Details
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label class="form-label" for="weight">Weight (kg)</label>
+          <div class="input-icon-wrapper">
+            <input type="number" step="0.1" min="0.1" class="form-control" id="weight" name="weight" required placeholder="e.g., 2.5">
+            <i class="fas fa-weight-hanging"></i>
+          </div>
         </div>
-
-        <!-- Parcel Details -->
-        <div class="card reveal" style="margin-top: 1.5rem; animation-delay: 0.2s;">
-            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f59e0b, #fbbf24); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
-                    <i class="fas fa-box"></i>
-                </div>
-                Parcel Details
-            </h3>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                <div class="form-group">
-                    <label class="form-label" for="weight">Weight (kg) *</label>
-                    <div class="input-icon-wrapper">
-                        <input type="number" step="0.1" min="0.1" class="form-control" id="weight" name="weight" required
-                            placeholder="e.g., 2.5"
-                            style="padding-left: 3rem;">
-                        <i class="fas fa-weight-hanging" style="left: 1rem;"></i>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="dimensions">Dimensions</label>
-                    <div class="input-icon-wrapper">
-                        <input type="text" class="form-control" id="dimensions" name="dimensions"
-                            placeholder="e.g., 30x20x15 cm"
-                            style="padding-left: 3rem;">
-                        <i class="fas fa-ruler-combined" style="left: 1rem;"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="category">Category</label>
-                <div class="input-icon-wrapper">
-                    <select class="form-control" id="category" name="category" style="padding-left: 3rem; appearance: auto;">
-                        <option value="">-- Select category --</option>
-                        <option value="electronics">Electronics</option>
-                        <option value="clothing">Clothing</option>
-                        <option value="documents">Documents</option>
-                        <option value="food">Food & Beverages</option>
-                        <option value="furniture">Furniture</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <i class="fas fa-tag" style="left: 1rem;"></i>
-                </div>
-            </div>
-
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="description">Description</label>
-                <div class="input-icon-wrapper">
-                    <textarea class="form-control" id="description" name="description" rows="3"
-                        placeholder="Describe the contents of your parcel (optional)"
-                        style="padding-left: 3rem; min-height: 100px;"></textarea>
-                    <i class="fas fa-align-left" style="left: 1rem; top: 1.5rem;"></i>
-                </div>
-            </div>
+        <div class="form-group">
+          <label class="form-label" for="dimensions">Dimensions</label>
+          <div class="input-icon-wrapper">
+            <input type="text" class="form-control" id="dimensions" name="dimensions" placeholder="e.g., 30×20×15 cm">
+            <i class="fas fa-ruler-combined"></i>
+          </div>
         </div>
-
-        <!-- Pickup Information -->
-        <div class="card reveal" style="margin-top: 1.5rem; animation-delay: 0.3s;">
-            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
-                    <i class="fas fa-map-pin"></i>
-                </div>
-                Pickup Information
-            </h3>
-
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="pickup_address">Pickup Address *</label>
-                <div class="input-icon-wrapper">
-                    <textarea class="form-control" id="pickup_address" name="pickup_address" rows="3" required
-                        placeholder="Enter the complete pickup address including city, state, and ZIP code"
-                        style="padding-left: 3rem; min-height: 100px;"></textarea>
-                    <i class="fas fa-home" style="left: 1rem; top: 1.5rem;"></i>
-                </div>
-            </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="category">Category</label>
+        <div class="input-icon-wrapper">
+          <select class="form-control" id="category" name="category">
+            <option value="">— Select category —</option>
+            <option value="electronics">Electronics</option>
+            <option value="clothing">Clothing</option>
+            <option value="documents">Documents</option>
+            <option value="food">Food &amp; Beverages</option>
+            <option value="furniture">Furniture</option>
+            <option value="other">Other</option>
+          </select>
+          <i class="fas fa-tag"></i>
         </div>
-
-        <!-- Shipping Information -->
-        <div class="card reveal" style="margin-top: 1.5rem; animation-delay: 0.4s;">
-            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444, #f87171); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-                Shipping Information
-            </h3>
-
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="shipping_cost">Shipping Cost ($)</label>
-                <div class="input-icon-wrapper">
-                    <input type="number" step="0.01" min="0" class="form-control" id="shipping_cost" name="shipping_cost"
-                        placeholder="e.g., 15.99"
-                        style="padding-left: 3rem;">
-                    <i class="fas fa-coins" style="left: 1rem;"></i>
-                </div>
-                <small class="form-text">Leave empty for automatic cost calculation</small>
-            </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="description">Description</label>
+        <div class="input-icon-wrapper">
+          <textarea class="form-control" id="description" name="description" rows="3" placeholder="Describe the contents of your parcel (optional)" style="padding-left:2.9rem;padding-top:1rem"></textarea>
+          <i class="fas fa-align-left" style="top:1.15rem;transform:none"></i>
         </div>
+      </div>
+    </div>
 
-        <!-- Submit Buttons -->
-        <div class="card reveal" style="margin-top: 1.5rem; animation-delay: 0.5s; padding: 1.5rem;">
-            <div id="alert-container"></div>
-
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <button type="submit" class="btn btn-primary" style="flex: 1; min-width: 200px; padding: 1rem; font-size: 1.1rem;">
-                    <i class="fas fa-paper-plane"></i> Create Parcel
-                </button>
-                <a href="/dashboard" class="btn btn-secondary" style="flex: 1; min-width: 200px; text-align: center; padding: 1rem;">
-                    <i class="fas fa-times"></i> Cancel
-                </a>
-            </div>
+    <!-- Pickup Information -->
+    <div class="card reveal" style="margin-top:1rem">
+      <div class="form-section-title" style="margin-bottom:var(--s5)">
+        <div class="section-icon green"><i class="fas fa-map-pin"></i></div>
+        Pickup Information
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="pickupaddress">Pickup Address</label>
+        <div class="input-icon-wrapper">
+          <textarea class="form-control" id="pickupaddress" name="pickupaddress" rows="3" required placeholder="Enter the complete pickup address including city, state, and ZIP code" style="padding-left:2.9rem;padding-top:1rem"></textarea>
+          <i class="fas fa-home" style="top:1.15rem;transform:none"></i>
         </div>
-    </form>
+      </div>
+    </div>
+
+    <!-- Shipping Cost -->
+    <div class="card reveal" style="margin-top:1rem">
+      <div class="form-section-title" style="margin-bottom:var(--s5)">
+        <div class="section-icon red"><i class="fas fa-dollar-sign"></i></div>
+        Shipping Information
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="shippingcost">Shipping Cost ($)</label>
+        <div class="input-icon-wrapper">
+          <input type="number" step="0.01" min="0" class="form-control" id="shippingcost" name="shippingcost" placeholder="e.g., 15.99">
+          <i class="fas fa-coins"></i>
+        </div>
+        <p class="form-text"><i class="fas fa-info-circle"></i> Leave empty for automatic cost calculation</p>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="card reveal" style="margin-top:1rem">
+      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <button type="submit" class="btn btn-primary btn-lg" style="flex:1;min-width:200px">
+          <i class="fas fa-paper-plane"></i> Create Parcel
+        </button>
+        <a href="/dashboard" class="btn btn-secondary btn-lg" style="flex:1;min-width:200px;justify-content:center">
+          <i class="fas fa-times"></i> Cancel
+        </a>
+      </div>
+    </div>
+  </form>
 </div>
 {% endblock %}
-
-{% block extra_js %}
+{% block extrajs %}
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
-    loadUsers();
-});
-
-function checkAuth() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '/login';
-    }
-}
-
+document.addEventListener('DOMContentLoaded', () => { checkAuth(); loadUsers(); });
+function checkAuth() { if (!localStorage.getItem('token')) window.location.href = '/login'; }
 async function loadUsers() {
-    const token = localStorage.getItem('token');
-    const select = document.getElementById('receiver_id');
-
-    // Show loading state
-    select.disabled = true;
-    select.innerHTML = '<option value="">Loading users...</option>';
-
-    try {
-        const response = await fetch('/api/parcels/customers', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (response.ok) {
-            const users = await response.json();
-
-            // Clear existing options
-            select.innerHTML = '<option value="">-- Select a user --</option>';
-
-            if (users.length === 0) {
-                const option = document.createElement('option');
-                option.value = "";
-                option.textContent = "No other customers available";
-                option.disabled = true;
-                select.appendChild(option);
-            } else {
-                users.forEach(user => {
-                    const option = document.createElement('option');
-                    option.value = user.id;
-                    option.textContent = `${user.full_name} (${user.username})`;
-                    select.appendChild(option);
-                });
-            }
-        } else {
-            throw new Error('Failed to load users');
-        }
-    } catch (error) {
-        console.error('Error loading users:', error);
-        select.innerHTML = '<option value="">-- Error loading users --</option>';
-    } finally {
-        select.disabled = false;
-    }
+  const token = localStorage.getItem('token');
+  const sel = document.getElementById('receiverid');
+  sel.disabled = true; sel.innerHTML = '<option value="">Loading users…</option>';
+  try {
+    const res = await fetch('/api/parcels/customers', {headers:{Authorization:'Bearer '+token}});
+    if (res.ok) {
+      const users = await res.json();
+      sel.innerHTML = '<option value="">— Select a user —</option>';
+      users.forEach(u => { sel.innerHTML += `<option value="${u.id}">${u.fullname} (${u.username})</option>`; });
+    } else throw new Error();
+  } catch { sel.innerHTML = '<option value="">Error loading users</option>'; }
+  finally { sel.disabled = false; }
 }
-
-document.getElementById('create-parcel-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const token = localStorage.getItem('token');
-    const formData = new FormData(e.target);
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalBtnContent = submitBtn.innerHTML;
-
-    // Show loading state
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating parcel...';
-    submitBtn.disabled = true;
-
-    const data = {
-        receiver_id: parseInt(formData.get('receiver_id')),
-        weight: parseFloat(formData.get('weight')),
-        dimensions: formData.get('dimensions'),
-        description: formData.get('description'),
-        category: formData.get('category'),
-        pickup_address: formData.get('pickup_address'),
-        delivery_address: formData.get('delivery_address'),
-        shipping_cost: formData.get('shipping_cost') ? parseFloat(formData.get('shipping_cost')) : null
-    };
-
-    try {
-        const response = await fetch('/api/parcels/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            showAlert(`Parcel created successfully! Tracking number: ${result.tracking_number}`, 'success');
-
-            // Animate success
-            submitBtn.innerHTML = '<i class="fas fa-check"></i> Created!';
-            submitBtn.style.background = 'linear-gradient(135deg, #10b981, #34d399)';
-
-            setTimeout(() => {
-                document.body.style.opacity = '0';
-                document.body.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => {
-                    window.location.href = `/track?number=${result.tracking_number}`;
-                }, 300);
-            }, 1500);
-        } else {
-            showAlert(result.detail || 'Failed to create parcel', 'error');
-            submitBtn.innerHTML = originalBtnContent;
-            submitBtn.disabled = false;
-        }
-    } catch (error) {
-        console.error('Error creating parcel:', error);
-        showAlert('An error occurred. Please try again.', 'error');
-        submitBtn.innerHTML = originalBtnContent;
-        submitBtn.disabled = false;
-    }
+document.getElementById('create-parcel-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  const fd = new FormData(e.target);
+  const btn = e.target.querySelector('button[type=submit]');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating parcel…'; btn.disabled = true;
+  const data = {receiverid:parseInt(fd.get('receiverid')),weight:parseFloat(fd.get('weight')),dimensions:fd.get('dimensions'),description:fd.get('description'),category:fd.get('category'),pickupaddress:fd.get('pickupaddress'),deliveryaddress:fd.get('deliveryaddress'),shippingcost:fd.get('shippingcost')?parseFloat(fd.get('shippingcost')):null};
+  try {
+    const res = await fetch('/api/parcels/create', {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(data)});
+    const r = await res.json();
+    if (res.ok) {
+      showAlert(`Parcel created! Tracking: ${r.trackingnumber}`, 'success');
+      btn.innerHTML = '<i class="fas fa-check"></i> Created!';
+      btn.style.background = 'var(--success)';
+      setTimeout(() => window.location.href = `/track?number=${r.trackingnumber}`, 1500);
+    } else { showAlert(r.detail||'Failed to create parcel.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
+  } catch { showAlert('An error occurred.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
 });
-
-function showAlert(message, type) {
-    const container = document.getElementById('alert-container');
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.style.animation = 'fadeInUp 0.4s ease-out';
-    alert.innerHTML = message;
-
-    container.innerHTML = '';
-    container.appendChild(alert);
-
-    setTimeout(() => {
-        alert.style.animation = 'fadeOut 0.4s ease-out forwards';
-        setTimeout(() => alert.remove(), 400);
-    }, 5000);
-}
-
-// Add fadeOut keyframes if not present
-if (!document.getElementById('fadeOut-style')) {
-    const style = document.createElement('style');
-    style.id = 'fadeOut-style';
-    style.textContent = `
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-10px); }
-        }
-    `;
-    document.head.appendChild(style);
+function showAlert(msg, type) {
+  const c = document.getElementById('alert-container');
+  c.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  setTimeout(()=>c.innerHTML='', 6000);
 }
 </script>
 {% endblock %}

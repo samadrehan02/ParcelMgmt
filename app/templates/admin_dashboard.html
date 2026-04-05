@@ -1,545 +1,269 @@
 {% extends "base.html" %}
-
 {% block title %}Admin Dashboard - Parcel Management System{% endblock %}
-
 {% block content %}
 <div class="container">
-    <!-- Header -->
-    <div class="card reveal">
-        <div class="card-header" style="flex-wrap: wrap; gap: 1rem;">
-            <div>
-                <h1 class="card-title">
-                    <i class="fas fa-shield-alt" style="color: var(--primary-color);"></i>
-                    Admin Dashboard
-                </h1>
-                <p class="card-subtitle">Overview of your parcel management system</p>
-            </div>
-            <a href="/create-parcel" class="btn btn-primary">
-                <i class="fas fa-plus"></i> New Parcel
-            </a>
-        </div>
+  <!-- Header -->
+  <div class="card reveal">
+    <div class="card-header">
+      <div>
+        <h1 class="card-title"><i class="fas fa-shield-alt"></i> Admin Dashboard</h1>
+        <p class="card-subtitle">Overview of your parcel management system</p>
+      </div>
+      <a href="/create-parcel" class="btn btn-primary"><i class="fas fa-plus"></i> New Parcel</a>
     </div>
+  </div>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid reveal" id="stats-container">
-        <div class="stat-card hover-card">
-            <div class="stat-icon blue">
-                <i class="fas fa-box"></i>
-            </div>
-            <div class="stat-info">
-                <h3 id="stat-total">-</h3>
-                <p>Total Parcels</p>
-            </div>
-        </div>
-
-        <div class="stat-card hover-card">
-            <div class="stat-icon green">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-info">
-                <h3 id="stat-customers">-</h3>
-                <p>Total Customers</p>
-            </div>
-        </div>
-
-        <div class="stat-card hover-card">
-            <div class="stat-icon orange">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-info">
-                <h3 id="stat-pending">-</h3>
-                <p>Pending Parcels</p>
-            </div>
-        </div>
-
-        <div class="stat-card hover-card">
-            <div class="stat-icon purple">
-                <i class="fas fa-truck"></i>
-            </div>
-            <div class="stat-info">
-                <h3 id="stat-transit">-</h3>
-                <p>In Transit</p>
-            </div>
-        </div>
-
-        <div class="stat-card hover-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46;">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-info">
-                <h3 id="stat-delivered">-</h3>
-                <p>Delivered</p>
-            </div>
-        </div>
-
-        <div class="stat-card hover-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e;">
-                <i class="fas fa-dollar-sign"></i>
-            </div>
-            <div class="stat-info">
-                <h3 id="stat-revenue">-</h3>
-                <p>Revenue</p>
-            </div>
-        </div>
+  <!-- Stats Cards -->
+  <div class="stats-grid stagger-children" style="margin-top:1rem" id="stats-container">
+    <div class="stat-card hover-card">
+      <div class="stat-icon blue"><i class="fas fa-box"></i></div>
+      <div class="stat-info"><h3 id="stat-total">—</h3><p>Total Parcels</p></div>
     </div>
-
-    <!-- Recent Parcels -->
-    <div class="card reveal">
-        <div class="card-header" style="flex-wrap: wrap; gap: 1rem;">
-            <h2 class="card-title">
-                <i class="fas fa-box"></i> Recent Parcels
-            </h2>
-            <div style="display: flex; gap: 0.5rem;">
-                <div class="input-icon-wrapper" style="width: 180px;">
-                    <select id="status-filter" class="form-control" style="width: 100%; padding: 0.5rem 2rem 0.5rem 2.5rem; font-size: 0.9rem;">
-                        <option value="">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="picked_up">Picked Up</option>
-                        <option value="in_transit">In Transit</option>
-                        <option value="out_for_delivery">Out for Delivery</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                    <i class="fas fa-filter" style="left: 0.75rem;"></i>
-                </div>
-                <button class="btn btn-secondary" onclick="refreshParcels()">
-                    <i class="fas fa-sync"></i>
-                </button>
-            </div>
-        </div>
-
-        <div id="parcels-table-container">
-            <div class="loading-pulse" style="padding: 3rem;">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <p style="text-align: center; color: var(--secondary-color);">Loading parcels...</p>
-        </div>
+    <div class="stat-card hover-card">
+      <div class="stat-icon green"><i class="fas fa-users"></i></div>
+      <div class="stat-info"><h3 id="stat-customers">—</h3><p>Total Customers</p></div>
     </div>
-
-    <!-- Quick Actions -->
-    <div class="card reveal">
-        <div class="card-header">
-            <h2 class="card-title">
-                <i class="fas fa-bolt" style="color: var(--warning-color);"></i> Quick Actions
-            </h2>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
-            <a href="/create-parcel" class="btn btn-primary" style="text-align: center; padding: 1rem;">
-                <i class="fas fa-plus"></i> Create New Parcel
-            </a>
-            <a href="/track" class="btn btn-secondary" style="text-align: center; padding: 1rem;">
-                <i class="fas fa-search"></i> Track Parcel
-            </a>
-            <a href="/dashboard" class="btn btn-secondary" style="text-align: center; padding: 1rem;">
-                <i class="fas fa-user"></i> Customer Dashboard
-            </a>
-        </div>
+    <div class="stat-card hover-card">
+      <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+      <div class="stat-info"><h3 id="stat-pending">—</h3><p>Pending Parcels</p></div>
     </div>
+    <div class="stat-card hover-card">
+      <div class="stat-icon purple"><i class="fas fa-truck"></i></div>
+      <div class="stat-info"><h3 id="stat-transit">—</h3><p>In Transit</p></div>
+    </div>
+    <div class="stat-card hover-card">
+      <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+      <div class="stat-info"><h3 id="stat-delivered">—</h3><p>Delivered</p></div>
+    </div>
+    <div class="stat-card hover-card">
+      <div class="stat-icon orange"><i class="fas fa-dollar-sign"></i></div>
+      <div class="stat-info"><h3 id="stat-revenue">—</h3><p>Revenue</p></div>
+    </div>
+  </div>
+
+  <!-- Parcels Table -->
+  <div class="card reveal" style="margin-top:1rem">
+    <div class="card-header">
+      <h2 class="card-title"><i class="fas fa-box"></i> All Parcels</h2>
+      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap">
+        <div class="input-icon-wrapper" style="width:200px">
+          <select id="status-filter" class="form-control btn-sm" style="min-height:40px;padding:.55rem 2.5rem .55rem 2.5rem">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="pickedup">Picked Up</option>
+            <option value="intransit">In Transit</option>
+            <option value="outfordelivery">Out for Delivery</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <i class="fas fa-filter"></i>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="refreshParcels()"><i class="fas fa-sync"></i></button>
+      </div>
+    </div>
+    <div id="parcels-table-container">
+      <div class="loading-pulse"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="card reveal" style="margin-top:1rem">
+    <div class="card-header"><h2 class="card-title"><i class="fas fa-bolt" style="color:var(--warning)"></i> Quick Actions</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem">
+      <a href="/create-parcel" class="btn btn-primary" style="justify-content:center"><i class="fas fa-plus"></i> Create New Parcel</a>
+      <a href="/track" class="btn btn-secondary" style="justify-content:center"><i class="fas fa-search"></i> Track Parcel</a>
+      <a href="/dashboard" class="btn btn-secondary" style="justify-content:center"><i class="fas fa-user"></i> Customer Dashboard</a>
+    </div>
+  </div>
 </div>
 
 <!-- Update Status Modal -->
 <div id="update-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title">
-                <i class="fas fa-edit" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
-                Update Parcel Status
-            </h2>
-            <button class="modal-close" onclick="closeModal()">&times;</button>
-        </div>
-
-        <div id="modal-alert"></div>
-
-        <form id="update-status-form">
-            <input type="hidden" id="update-parcel-id">
-
-            <div class="form-group">
-                <label class="form-label">Status</label>
-                <div class="input-icon-wrapper">
-                    <select class="form-control" id="update-status" required style="padding-left: 3rem; appearance: auto;">
-                        <option value="pending">Pending</option>
-                        <option value="picked_up">Picked Up</option>
-                        <option value="in_transit">In Transit</option>
-                        <option value="out_for_delivery">Out for Delivery</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                    <i class="fas fa-tag" style="left: 1rem;"></i>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Location (optional)</label>
-                <div class="input-icon-wrapper">
-                    <input type="text" class="form-control" id="update-location" placeholder="Current location"
-                        style="padding-left: 3rem;">
-                    <i class="fas fa-map-marker-alt" style="left: 1rem;"></i>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Note (optional)</label>
-                <div class="input-icon-wrapper">
-                    <textarea class="form-control" id="update-note" rows="2" placeholder="Add a note about this update"
-                        style="padding-left: 3rem; min-height: 80px;"></textarea>
-                    <i class="fas fa-sticky-note" style="left: 1rem; top: 1.25rem;"></i>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button type="submit" class="btn btn-primary" style="flex: 1;">
-                    <i class="fas fa-save"></i> Update Status
-                </button>
-                <button type="button" class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-                    Cancel
-                </button>
-            </div>
-        </form>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title"><i class="fas fa-edit" style="color:var(--primary);margin-right:.5rem"></i> Update Parcel Status</h2>
+      <button class="modal-close" onclick="closeModal()">&#215;</button>
     </div>
+    <div id="modal-alert"></div>
+    <form id="update-status-form">
+      <input type="hidden" id="update-parcel-id">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <div class="input-icon-wrapper">
+          <select class="form-control" id="update-status" required>
+            <option value="pending">Pending</option>
+            <option value="pickedup">Picked Up</option>
+            <option value="intransit">In Transit</option>
+            <option value="outfordelivery">Out for Delivery</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <i class="fas fa-tag"></i>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Location <span style="color:var(--text-faint);font-weight:400">(optional)</span></label>
+        <div class="input-icon-wrapper">
+          <input type="text" class="form-control" id="update-location" placeholder="Current location">
+          <i class="fas fa-map-marker-alt"></i>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Note <span style="color:var(--text-faint);font-weight:400">(optional)</span></label>
+        <div class="input-icon-wrapper">
+          <textarea class="form-control" id="update-note" rows="2" placeholder="Add a note about this update" style="padding-left:2.9rem;padding-top:.9rem;min-height:80px"></textarea>
+          <i class="fas fa-sticky-note" style="top:1rem;transform:none"></i>
+        </div>
+      </div>
+      <div style="display:flex;gap:.75rem;margin-top:1rem">
+        <button type="submit" class="btn btn-primary" style="flex:1"><i class="fas fa-save"></i> Update Status</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal()" style="flex:1">Cancel</button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
-
-{% block extra_js %}
+{% block extrajs %}
 <script>
-let currentParcels = [];
-let selectedParcelId = null;
+let currentParcels = [], selectedParcelId = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
-    loadDashboardStats();
-    loadParcels();
-
-    document.getElementById('status-filter').addEventListener('change', filterParcels);
-    document.getElementById('update-status-form').addEventListener('submit', handleUpdateSubmit);
-});
+document.addEventListener('DOMContentLoaded', () => { checkAuth(); loadStats(); loadParcels(); });
+document.getElementById('status-filter').addEventListener('change', filterParcels);
+document.getElementById('update-status-form').addEventListener('submit', handleUpdate);
 
 function checkAuth() {
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-
-    if (!token || user.role !== 'admin') {
-        window.location.href = '/login';
-    }
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (!token || user.role !== 'admin') window.location.href = '/login';
 }
 
-async function loadDashboardStats() {
-    const token = localStorage.getItem('token');
-
-    try {
-        const response = await fetch('/api/admin/dashboard/stats', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (response.ok) {
-            const stats = await response.json();
-            updateStatsDisplay(stats);
-        } else {
-            throw new Error('Failed to load stats');
-        }
-    } catch (error) {
-        console.error('Error loading stats:', error);
-    }
+async function loadStats() {
+  const token = localStorage.getItem('token');
+  try {
+    const res = await fetch('/api/admin/dashboard/stats', {headers:{Authorization:'Bearer '+token}});
+    if (res.ok) { const s = await res.json(); updateStats(s); }
+  } catch {}
 }
 
-function updateStatsDisplay(stats) {
-    animateCounter(document.getElementById('stat-total'), stats.total_parcels, 1500);
-    animateCounter(document.getElementById('stat-customers'), stats.total_customers, 1500);
-    animateCounter(document.getElementById('stat-pending'), stats.pending_parcels, 1500);
-    animateCounter(document.getElementById('stat-transit'), stats.in_transit_parcels, 1500);
-    animateCounter(document.getElementById('stat-delivered'), stats.delivered_parcels, 1500);
-
-    // Revenue with decimal
-    const revenueEl = document.getElementById('stat-revenue');
-    revenueEl.textContent = '$' + stats.revenue.toFixed(2);
-    revenueEl.style.opacity = '0';
-    revenueEl.style.transform = 'translateY(20px)';
-    revenueEl.style.transition = 'all 0.5s ease';
-
-    requestAnimationFrame(() => {
-        revenueEl.style.opacity = '1';
-        revenueEl.style.transform = 'translateY(0)';
-    });
+function updateStats(s) {
+  animNum('stat-total', s.totalparcels);
+  animNum('stat-customers', s.totalcustomers);
+  animNum('stat-pending', s.pendingparcels);
+  animNum('stat-transit', s.intransitparcels);
+  animNum('stat-delivered', s.deliveredparcels);
+  const rev = document.getElementById('stat-revenue');
+  rev.textContent = '$' + (s.revenue || 0).toFixed(2);
+  rev.style.animation = 'countUp .6s ease';
 }
 
-function animateCounter(element, target, duration = 2000) {
-    const start = 0;
-    const increment = target / (duration / 16);
-    let current = start;
-
-    element.style.opacity = '0';
-    element.style.transform = 'translateY(20px)';
-    element.style.transition = 'all 0.5s ease';
-
-    const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-            current = target;
-            clearInterval(timer);
-        }
-        element.textContent = Math.floor(current).toLocaleString();
-    }, 16);
-
-    requestAnimationFrame(() => {
-        element.style.opacity = '1';
-        element.style.transform = 'translateY(0)';
-    });
+function animNum(id, end) {
+  const el = document.getElementById(id);
+  let cur = 0, step = Math.max(1, Math.ceil(end / 40));
+  const t = setInterval(() => { cur = Math.min(cur + step, end); el.textContent = cur.toLocaleString(); if (cur >= end) clearInterval(t); }, 25);
 }
 
 async function loadParcels() {
-    const token = localStorage.getItem('token');
-    const container = document.getElementById('parcels-table-container');
-
-    try {
-        const response = await fetch('/api/parcels/admin/all', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (response.ok) {
-            currentParcels = await response.json();
-            displayParcels(currentParcels);
-        } else {
-            throw new Error('Failed to load parcels');
-        }
-    } catch (error) {
-        console.error('Error loading parcels:', error);
-        container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-exclamation-circle empty-state-icon" style="color: var(--danger-color);"></i>
-                <h3>Failed to load parcels</h3>
-                <button class="btn btn-primary mt-2" onclick="loadParcels()"><i class="fas fa-sync"></i> Retry</button>
-            </div>
-        `;
-    }
+  const token = localStorage.getItem('token');
+  const c = document.getElementById('parcels-table-container');
+  try {
+    const res = await fetch('/api/parcels/admin/all', {headers:{Authorization:'Bearer '+token}});
+    if (res.ok) { currentParcels = await res.json(); displayParcels(currentParcels); }
+    else throw new Error();
+  } catch {
+    c.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle empty-state-icon" style="color:var(--danger)"></i><h3>Failed to load parcels</h3><button class="btn btn-primary mt-4" onclick="loadParcels()"><i class="fas fa-sync"></i> Retry</button></div>`;
+  }
 }
 
 function filterParcels() {
-    const filter = document.getElementById('status-filter').value;
-    if (filter) {
-        const filtered = currentParcels.filter(p => p.status === filter);
-        displayParcels(filtered);
-    } else {
-        displayParcels(currentParcels);
-    }
+  const f = document.getElementById('status-filter').value;
+  displayParcels(f ? currentParcels.filter(p => p.status === f) : currentParcels);
 }
 
 function refreshParcels() {
-    const btn = document.querySelector('.fa-sync').parentElement;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    loadParcels().then(() => {
-        btn.innerHTML = '<i class="fas fa-sync"></i>';
-    });
+  const btn = document.querySelector('[onclick="refreshParcels()"]');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  loadParcels().finally(() => { btn.innerHTML = '<i class="fas fa-sync"></i>'; });
 }
 
 function displayParcels(parcels) {
-    const container = document.getElementById('parcels-table-container');
-
-    if (parcels.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state" style="padding: 3rem;">
-                <i class="fas fa-box-open empty-state-icon"></i>
-                <h3>No parcels found</h3>
-            </div>
-        `;
-        return;
-    }
-
-    container.innerHTML = `
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Tracking #</th>
-                        <th>Status</th>
-                        <th>Sender</th>
-                        <th>Receiver</th>
-                        <th>Weight</th>
-                        <th>Cost</th>
-                        <th>Created</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${parcels.map((parcel, index) => `
-                        <tr style="animation: slideInRight 0.4s ease-out ${index * 0.03}s backwards;">
-                            <td>
-                                <strong style="font-family: var(--font-mono); font-size: 0.85rem;">${parcel.tracking_number}</strong>
-                            </td>
-                            <td>
-                                <span class="badge badge-${parcel.status}">
-                                    <i class="fas ${getStatusIcon(parcel.status)}"></i>
-                                    ${formatStatus(parcel.status)}
-                                </span>
-                            </td>
-                            <td>${parcel.sender_name || parcel.sender_id}</td>
-                            <td>${parcel.receiver_name || parcel.receiver_id}</td>
-                            <td>${parcel.weight} kg</td>
-                            <td>${parcel.shipping_cost ? '$' + parcel.shipping_cost.toFixed(2) : 'N/A'}</td>
-                            <td>${formatDate(parcel.created_at)}</td>
-                            <td>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <button class="btn btn-primary btn-sm" style="padding: 0.5rem;"
-                                        onclick="openUpdateModal(${parcel.id}, '${parcel.status}')"
-                                        title="Update Status">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <a href="/track?number=${parcel.tracking_number}" class="btn btn-secondary btn-sm" style="padding: 0.5rem;"
-                                        title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
+  const c = document.getElementById('parcels-table-container');
+  if (!parcels.length) {
+    c.innerHTML = `<div class="empty-state"><i class="fas fa-box-open empty-state-icon"></i><h3>No parcels found</h3></div>`;
+    return;
+  }
+  c.innerHTML = `<div class="table-container"><table class="table"><thead><tr>
+    <th>Tracking</th><th>Status</th><th>Sender</th><th>Receiver</th><th>Weight</th><th>Cost</th><th>Created</th><th>Actions</th>
+  </tr></thead><tbody>
+  ${parcels.map((p, i) => `<tr style="animation:fadeSlideIn .4s ${i * .03}s both">
+    <td><span class="font-mono" style="font-size:var(--text-xs)">${p.trackingnumber}</span></td>
+    <td><span class="badge badge-${p.status}"><i class="fas ${sIcon(p.status)}"></i> ${sLabel(p.status)}</span></td>
+    <td>${p.sendername || p.senderid}</td>
+    <td>${p.receivername || p.receiverid}</td>
+    <td>${p.weight} kg</td>
+    <td>${p.shippingcost ? '$' + p.shippingcost.toFixed(2) : '—'}</td>
+    <td>${fmtDate(p.createdat)}</td>
+    <td><div style="display:flex;gap:.4rem">
+      <button class="btn btn-primary btn-sm" onclick="openModal('${p.id}','${p.status}')" title="Update Status"><i class="fas fa-edit"></i></button>
+      <a href="/track?number=${p.trackingnumber}" class="btn btn-secondary btn-sm" title="View Details"><i class="fas fa-eye"></i></a>
+    </div></td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
 }
 
-function openUpdateModal(parcelId, currentStatus) {
-    selectedParcelId = parcelId;
-    document.getElementById('update-parcel-id').value = parcelId;
-    document.getElementById('update-status').value = currentStatus;
-    document.getElementById('update-location').value = '';
-    document.getElementById('update-note').value = '';
-
-    const modal = document.getElementById('update-modal');
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+function openModal(id, status) {
+  selectedParcelId = id;
+  document.getElementById('update-parcel-id').value = id;
+  document.getElementById('update-status').value = status;
+  document.getElementById('update-location').value = '';
+  document.getElementById('update-note').value = '';
+  document.getElementById('modal-alert').innerHTML = '';
+  document.getElementById('update-modal').classList.add('active');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
-    const modal = document.getElementById('update-modal');
-    modal.classList.remove('active');
-    document.body.style.overflow = 'auto';
-    document.getElementById('modal-alert').innerHTML = '';
-    selectedParcelId = null;
+  document.getElementById('update-modal').classList.remove('active');
+  document.body.style.overflow = '';
+  selectedParcelId = null;
 }
 
-async function handleUpdateSubmit(e) {
-    e.preventDefault();
-    await updateParcelStatus();
-}
-
-async function updateParcelStatus() {
-    const token = localStorage.getItem('token');
-    const status = document.getElementById('update-status').value;
-    const location = document.getElementById('update-location').value;
-    const note = document.getElementById('update-note').value;
-
-    const submitBtn = document.querySelector('#update-status-form button[type="submit"]');
-    const originalBtnContent = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-    submitBtn.disabled = true;
-
-    try {
-        const response = await fetch(`/api/parcels/admin/${selectedParcelId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ status })
-        });
-
-        if (response.ok) {
-            // Add tracking event if location or note provided
-            if (location || note) {
-                await fetch(`/api/parcels/admin/${selectedParcelId}/tracking`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        status: status,
-                        location,
-                        description: note
-                    })
-                });
-            }
-
-            showModalAlert('Status updated successfully!', 'success');
-
-            setTimeout(() => {
-                closeModal();
-                loadParcels();
-                loadDashboardStats();
-            }, 1000);
-        } else {
-            const error = await response.json();
-            showModalAlert(error.detail || 'Failed to update status', 'error');
-        }
-    } catch (error) {
-        console.error('Update error:', error);
-        showModalAlert('An error occurred', 'error');
-    } finally {
-        submitBtn.innerHTML = originalBtnContent;
-        submitBtn.disabled = false;
-    }
-}
-
-function showModalAlert(message, type) {
-    const container = document.getElementById('modal-alert');
-    container.innerHTML = `
-        <div class="alert alert-${type}" style="margin-bottom: 1rem;">
-            ${message}
-        </div>
-    `;
-}
-
-function getStatusIcon(status) {
-    const icons = {
-        'pending': 'fa-clock',
-        'picked_up': 'fa-hand-holding',
-        'in_transit': 'fa-truck',
-        'out_for_delivery': 'fa-shipping-fast',
-        'delivered': 'fa-check-circle',
-        'cancelled': 'fa-times-circle'
-    };
-    return icons[status] || 'fa-circle';
-}
-
-function formatStatus(status) {
-    const statusMap = {
-        'pending': 'Pending',
-        'picked_up': 'Picked Up',
-        'in_transit': 'In Transit',
-        'out_for_delivery': 'Out for Delivery',
-        'delivered': 'Delivered',
-        'cancelled': 'Cancelled'
-    };
-    return statusMap[status] || status;
-}
-
-function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+async function handleUpdate(e) {
+  e.preventDefault();
+  const token = localStorage.getItem('token');
+  const status = document.getElementById('update-status').value;
+  const location = document.getElementById('update-location').value;
+  const note = document.getElementById('update-note').value;
+  const btn = e.target.querySelector('button[type=submit]');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating…'; btn.disabled = true;
+  try {
+    const res = await fetch(`/api/parcels/admin/${selectedParcelId}`, {
+      method:'PUT', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({status, location, description: note})
     });
+    if (res.ok) {
+      if (location || note) {
+        await fetch(`/api/parcels/admin/${selectedParcelId}/tracking`, {
+          method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+          body: JSON.stringify({status, location, description: note})
+        });
+      }
+      document.getElementById('modal-alert').innerHTML = `<div class="alert alert-success" style="margin-bottom:1rem">Status updated successfully!</div>`;
+      setTimeout(() => { closeModal(); loadParcels(); loadStats(); }, 900);
+    } else {
+      const err = await res.json();
+      document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem">${err.detail || 'Failed to update.'}</div>`;
+    }
+  } catch {
+    document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error" style="margin-bottom:1rem">An error occurred.</div>`;
+  } finally { btn.innerHTML = orig; btn.disabled = false; }
 }
 
-// Add slideInRight keyframes
-if (!document.getElementById('slideInRight-style')) {
-    const style = document.createElement('style');
-    style.id = 'slideInRight-style';
-    style.textContent = `
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-    `;
-    document.head.appendChild(style);
-}
+// Close modal on backdrop click
+document.getElementById('update-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+const sIcon = s => ({pending:'fa-clock',pickedup:'fa-hand-holding',intransit:'fa-truck',outfordelivery:'fa-shipping-fast',delivered:'fa-check-circle',cancelled:'fa-times-circle'}[s] || 'fa-circle');
+const sLabel = s => ({pending:'Pending',pickedup:'Picked Up',intransit:'In Transit',outfordelivery:'Out for Delivery',delivered:'Delivered',cancelled:'Cancelled'}[s] || s);
+const fmtDate = d => new Date(d).toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
 </script>
 {% endblock %}

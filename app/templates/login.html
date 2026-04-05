@@ -1,219 +1,89 @@
 {% extends "base.html" %}
-
 {% block title %}Login - Parcel Management System{% endblock %}
-
 {% block content %}
 <div class="container-narrow">
-    <div class="card hover-card" style="margin-top: 3rem; animation: fadeInUp 0.6s ease-out;">
-        <div class="text-center mb-4">
-            <div style="
-                width: 90px;
-                height: 90px;
-                margin: 0 auto 1.5rem;
-                background: var(--primary-gradient);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                color: white;
-                box-shadow: var(--shadow-glow);
-                animation: float 3s ease-in-out infinite;
-            ">
-                <i class="fas fa-box-open"></i>
-            </div>
-            <h2 style="font-size: 1.75rem; font-weight: 700; color: var(--dark-color); margin-bottom: 0.5rem;">Welcome Back!</h2>
-            <p style="color: var(--secondary-color);">Login to manage your parcels</p>
-        </div>
-
-        <div id="alert-container"></div>
-
-        <form id="login-form" style="animation: fadeInUp 0.6s ease-out 0.1s backwards;">
-            <div class="form-group">
-                <label class="form-label" for="username">
-                    <i class="fas fa-user" style="margin-right: 0.5rem; color: var(--primary-color);"></i>Username or Email
-                </label>
-                <div class="input-icon-wrapper">
-                    <input type="text" class="form-control" id="username" name="username" required
-                        placeholder="Enter your username or email"
-                        style="padding-left: 3rem;">
-                    <i class="fas fa-user" style="left: 1rem;"></i>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="password">
-                    <i class="fas fa-lock" style="margin-right: 0.5rem; color: var(--primary-color);"></i>Password
-                </label>
-                <div class="input-icon-wrapper">
-                    <input type="password" class="form-control" id="password" name="password" required
-                        placeholder="Enter your password"
-                        style="padding-left: 3rem; padding-right: 3rem;">
-                    <i class="fas fa-lock" style="left: 1rem;"></i>
-                    <button type="button" id="toggle-password">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
-                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; color: var(--secondary-color);">
-                    <input type="checkbox" id="remember" name="remember" style="cursor: pointer;">
-                    Remember me
-                </label>
-                <a href="#" style="color: var(--primary-color); font-size: 0.9rem; text-decoration: none; font-weight: 600;">Forgot password?</a>
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </button>
-        </form>
-
-        <div class="text-center mt-4" style="animation: fadeInUp 0.6s ease-out 0.2s backwards;">
-            <p style="color: var(--secondary-color);">
-                Don't have an account? <a href="/register" style="color: var(--primary-color); font-weight: 700; text-decoration: none;">Register now</a>
-            </p>
-        </div>
-
-        <!-- Demo Credentials -->
-        <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #f8fafc, #e2e8f0); border-radius: 1rem; border: 1px solid var(--border-color); animation: fadeInUp 0.6s ease-out 0.3s backwards;">
-            <h4 style="margin-bottom: 1rem; color: var(--dark-color); display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-info-circle" style="color: var(--primary-color);"></i> Demo Credentials
-            </h4>
-
-            <div style="display: grid; gap: 0.75rem;">
-                <div style="
-                    padding: 0.75rem 1rem;
-                    background: white;
-                    border-radius: 0.5rem;
-                    border-left: 4px solid var(--primary-color);
-                    font-size: 0.9rem;
-                ">
-                    <strong style="color: var(--primary-color);">Admin:</strong>
-                    <span style="color: var(--secondary-color);"> username: <strong style="color: var(--dark-color);">admin</strong> | password: <strong style="color: var(--dark-color);">admin123</strong></span>
-                </div>
-
-                <div style="
-                    padding: 0.75rem 1rem;
-                    background: white;
-                    border-radius: 0.5rem;
-                    border-left: 4px solid var(--success-color);
-                    font-size: 0.9rem;
-                ">
-                    <strong style="color: var(--success-color);">Customer:</strong>
-                    <span style="color: var(--secondary-color);"> Create an account or use registered credentials</span>
-                </div>
-            </div>
-        </div>
+  <div class="card hover-card reveal" style="margin-top:2.5rem">
+    <div class="text-center mb-6">
+      <div style="width:80px;height:80px;margin:0 auto var(--s5);border-radius:1.4rem;background:linear-gradient(135deg,#0e8a8c,#2d78f2);display:grid;place-items:center;font-size:2.2rem;color:#fff;box-shadow:0 12px 28px rgba(14,138,140,.28);animation:floaty 5s ease-in-out infinite">
+        <i class="fas fa-box-open"></i>
+      </div>
+      <h2 style="font-size:var(--text-xl);font-weight:900;margin-bottom:.3rem">Welcome Back!</h2>
+      <p style="color:var(--text-muted)">Login to manage your parcels</p>
     </div>
+
+    <div id="alert-container"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label" for="username"><i class="fas fa-user" style="color:var(--primary);margin-right:.4rem"></i>Username or Email</label>
+        <div class="input-icon-wrapper">
+          <input type="text" class="form-control" id="username" name="username" required placeholder="Enter your username or email">
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password"><i class="fas fa-lock" style="color:var(--primary);margin-right:.4rem"></i>Password</label>
+        <div class="input-icon-wrapper">
+          <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password" style="padding-left:2.9rem;padding-right:3rem">
+          <i class="fas fa-lock"></i>
+          <button type="button" id="toggle-password" aria-label="Toggle password"><i class="fas fa-eye"></i></button>
+        </div>
+      </div>
+      <div class="form-group flex justify-between items-center">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:var(--text-sm);color:var(--text-muted)">
+          <input type="checkbox" id="remember" name="remember" style="cursor:pointer"> Remember me
+        </label>
+        <a href="#" style="color:var(--primary);font-size:var(--text-sm);font-weight:700">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn btn-primary w-full" style="margin-top:.5rem">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+    </form>
+
+    <div class="text-center mt-6" style="font-size:var(--text-sm)">
+      <span style="color:var(--text-muted)">Don't have an account? </span>
+      <a href="/register" style="color:var(--primary);font-weight:700">Register now</a>
+    </div>
+
+    <!-- Demo creds -->
+    <div style="margin-top:1.75rem;padding:1.15rem;background:var(--surface-soft);border-radius:var(--r-lg);border:1px solid var(--border)">
+      <h4 style="font-size:var(--text-sm);font-weight:800;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem"><i class="fas fa-info-circle" style="color:var(--primary)"></i> Demo Credentials</h4>
+      <div class="demo-cred"><strong style="color:var(--primary)">Admin</strong> — username: <strong>admin</strong> · password: <strong>admin123</strong></div>
+      <div class="demo-cred">Register or use an existing customer account</div>
+    </div>
+  </div>
 </div>
-
-<style>
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-</style>
 {% endblock %}
-
-{% block extra_js %}
+{% block extrajs %}
 <script>
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.target);
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalBtnContent = submitBtn.innerHTML;
-
-    // Show loading state
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-    submitBtn.disabled = true;
-
-    try {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            body: new URLSearchParams(formData),
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            // Store token and user info
-            localStorage.setItem('token', data.access_token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-
-            // Show success message
-            showAlert('Login successful! Redirecting...', 'success');
-
-            // Redirect based on role with animation
-            setTimeout(() => {
-                document.body.style.opacity = '0';
-                document.body.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => {
-                    window.location.href = data.user.role === 'admin' ? '/admin' : '/dashboard';
-                }, 300);
-            }, 800);
-        } else {
-            showAlert(data.detail || 'Login failed. Please check your credentials.', 'error');
-            submitBtn.innerHTML = originalBtnContent;
-            submitBtn.disabled = false;
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        showAlert('An error occurred. Please try again.', 'error');
-        submitBtn.innerHTML = originalBtnContent;
-        submitBtn.disabled = false;
-    }
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type=submit]');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in…';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/auth/login', {method:'POST', body: new URLSearchParams(new FormData(e.target)), headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      showAlert('Login successful! Redirecting…', 'success');
+      setTimeout(() => { window.location.href = data.user.role === 'admin' ? '/admin' : '/dashboard'; }, 900);
+    } else { showAlert(data.detail || 'Login failed.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
+  } catch { showAlert('An error occurred.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
 });
-
-// Toggle password visibility
-const togglePassword = document.getElementById('toggle-password');
-const passwordInput = document.getElementById('password');
-
-if (togglePassword && passwordInput) {
-    togglePassword.addEventListener('click', () => {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        togglePassword.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-    });
-}
-
-function showAlert(message, type) {
-    const container = document.getElementById('alert-container');
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.style.animation = 'fadeInUp 0.4s ease-out';
-    alert.innerHTML = message;
-
-    container.innerHTML = '';
-    container.appendChild(alert);
-
-    setTimeout(() => {
-        alert.style.animation = 'fadeOut 0.4s ease-out forwards';
-        setTimeout(() => alert.remove(), 400);
-    }, 5000);
-}
-
-// Add fadeOut keyframes if not present
-if (!document.getElementById('fadeOut-style')) {
-    const style = document.createElement('style');
-    style.id = 'fadeOut-style';
-    style.textContent = `
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-10px); }
-        }
-    `;
-    document.head.appendChild(style);
+const tp = document.getElementById('toggle-password');
+const pi = document.getElementById('password');
+tp.addEventListener('click', () => {
+  const t = pi.getAttribute('type') === 'password' ? 'text' : 'password';
+  pi.setAttribute('type', t);
+  tp.innerHTML = t === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+});
+function showAlert(msg, type) {
+  const c = document.getElementById('alert-container');
+  c.innerHTML = `<div class="alert alert-${type}" style="margin-bottom:1rem">${msg}</div>`;
+  setTimeout(() => c.innerHTML = '', 5000);
 }
 </script>
 {% endblock %}

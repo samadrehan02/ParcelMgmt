@@ -1,534 +1,186 @@
 {% extends "base.html" %}
-
 {% block title %}Track Parcel - Parcel Management System{% endblock %}
-
 {% block content %}
 <div class="container">
-    <!-- Search Section -->
-    <div class="card reveal" style="margin-top: 2rem; text-align: center;">
-        <div style="max-width: 600px; margin: 0 auto;">
-            <div style="
-                width: 90px;
-                height: 90px;
-                margin: 0 auto 1.5rem;
-                background: linear-gradient(135deg, #f59e0b, #fbbf24);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-                color: white;
-                box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
-                animation: float 3s ease-in-out infinite;
-            ">
-                <i class="fas fa-search-location"></i>
-            </div>
-            <h1 style="font-size: 2rem; font-weight: 800; color: var(--dark-color); margin-bottom: 0.5rem;">
-                Track Your Parcel
-            </h1>
-            <p style="color: var(--secondary-color); margin-bottom: 2rem;">
-                Enter your tracking number to see the latest status and location
-            </p>
+  <!-- Search Section -->
+  <div class="card reveal" style="margin-top:1rem;text-align:center">
+    <div style="max-width:580px;margin:0 auto">
+      <div style="width:80px;height:80px;margin:0 auto var(--s5);border-radius:1.4rem;background:linear-gradient(135deg,#d4891a,#f5c56b);display:grid;place-items:center;font-size:2.2rem;color:#fff;box-shadow:0 12px 28px rgba(212,137,26,.28);animation:floaty 5s ease-in-out infinite">
+        <i class="fas fa-search-location"></i>
+      </div>
+      <h1 style="font-size:var(--text-xl);font-weight:900;margin-bottom:.4rem">Track Your Parcel</h1>
+      <p style="color:var(--text-muted);margin-bottom:1.75rem">Enter your tracking number to see the latest status and location</p>
+
+      <div id="alert-container"></div>
+
+      <form id="track-form" style="max-width:480px;margin:0 auto">
+        <div class="search-box">
+          <div style="flex:1;position:relative">
+            <i class="fas fa-barcode" style="position:absolute;left:1.1rem;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:1.1rem;pointer-events:none"></i>
+            <input type="text" id="trackingnumber" name="trackingnumber" placeholder="e.g. TRK123456789ABC" required
+              style="width:100%;min-height:52px;padding:.9rem 1rem .9rem 3rem;border:1.5px solid var(--border);border-radius:var(--r-lg);background:#fff;font-size:var(--text-base);transition:border-color var(--t),box-shadow var(--t)">
+          </div>
+          <button type="submit" class="btn btn-primary" style="flex-shrink:0">
+            <i class="fas fa-search"></i> Track
+          </button>
         </div>
+      </form>
 
-        <div id="alert-container"></div>
-
-        <form id="track-form" style="max-width: 500px; margin: 0 auto;">
-            <div class="search-box" style="margin-bottom: 0;">
-                <div style="flex: 1; position: relative;">
-                    <i class="fas fa-barcode" style="
-                        position: absolute;
-                        left: 1.25rem;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        color: var(--secondary-color);
-                        font-size: 1.25rem;
-                    "></i>
-                    <input type="text" id="tracking_number" name="tracking_number"
-                        placeholder="Enter tracking number (e.g., TRK123456789ABC)"
-                        required
-                        style="
-                            width: 100%;
-                            padding: 1rem 1.25rem 1rem 3rem;
-                            border: 2px solid var(--border-color);
-                            border-radius: var(--radius-full);
-                            font-size: 1rem;
-                            transition: all 0.3s ease;
-                        "
-                    >
-                </div>
-                <button type="submit" class="btn btn-primary" style="border-radius: var(--radius-full); padding: 1rem 2rem;">
-                    <i class="fas fa-search"></i> Track
-                </button>
-            </div>
-        </form>
-
-        <!-- Recent Searches -->
-        <div id="recent-searches" style="margin-top: 1.5rem; display: none;">
-            <p style="color: var(--secondary-color); font-size: 0.9rem; margin-bottom: 0.5rem;">Recent searches:</p>
-            <div id="recent-searches-list" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-            </div>
-        </div>
+      <!-- Recent Searches -->
+      <div id="recent-searches" style="margin-top:1.25rem;display:none">
+        <p style="color:var(--text-muted);font-size:var(--text-xs);margin-bottom:.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Recent Searches</p>
+        <div id="recent-searches-list" style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap"></div>
+      </div>
     </div>
+  </div>
 
-    <!-- Results Section -->
-    <div id="tracking-results"></div>
+  <!-- Results -->
+  <div id="tracking-results"></div>
 </div>
-
-<style>
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-.status-step {
-    opacity: 0;
-    animation: fadeInUp 0.5s ease-out forwards;
-}
-
-.status-step:nth-child(1) { animation-delay: 0.1s; }
-.status-step:nth-child(2) { animation-delay: 0.2s; }
-.status-step:nth-child(3) { animation-delay: 0.3s; }
-.status-step:nth-child(4) { animation-delay: 0.4s; }
-.status-step:nth-child(5) { animation-delay: 0.5s; }
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-</style>
 {% endblock %}
-
-{% block extra_js %}
+{% block extrajs %}
 <script>
-// Load recent searches from localStorage
-const RECENT_SEARCHES_KEY = 'parcel_recent_searches';
-const MAX_RECENT_SEARCHES = 5;
+const RECENT_KEY = 'parcel_recent_searches';
+const MAX_RECENT = 5;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Check for tracking number in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const trackingNumber = urlParams.get('number');
-
-    if (trackingNumber) {
-        document.getElementById('tracking_number').value = trackingNumber;
-        trackParcel(trackingNumber);
-    }
-
-    // Load and display recent searches
-    loadRecentSearches();
+  const params = new URLSearchParams(window.location.search);
+  const num = params.get('number');
+  if (num) { document.getElementById('trackingnumber').value = num; trackParcel(num); }
+  loadRecentSearches();
 });
 
-document.getElementById('track-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const trackingNumber = document.getElementById('tracking_number').value.trim();
-    if (trackingNumber) {
-        trackParcel(trackingNumber);
-    }
+document.getElementById('track-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const num = document.getElementById('trackingnumber').value.trim();
+  if (num) trackParcel(num);
 });
 
 function loadRecentSearches() {
-    const searches = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || '[]');
-    const container = document.getElementById('recent-searches');
-    const list = document.getElementById('recent-searches-list');
-
-    if (searches.length === 0) {
-        container.style.display = 'none';
-        return;
-    }
-
-    container.style.display = 'block';
-    list.innerHTML = searches.map(num => `
-        <button onclick="trackParcel('${num}'); document.getElementById('tracking_number').value = '${num}';"
-            style="
-                padding: 0.5rem 1rem;
-                background: var(--light-color);
-                border: 1px solid var(--border-color);
-                border-radius: var(--radius-full);
-                font-size: 0.85rem;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                color: var(--secondary-color);
-            "
-            onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'; this.style.borderColor='var(--primary-color)';"
-            onmouseout="this.style.background='var(--light-color)'; this.style.color='var(--secondary-color)'; this.style.borderColor='var(--border-color)';"
-        >
-            <i class="fas fa-history"></i> ${num}
-        </button>
-    `).join('');
+  const searches = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+  const wrap = document.getElementById('recent-searches');
+  const list = document.getElementById('recent-searches-list');
+  if (!searches.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = searches.map(n => `<button onclick="trackParcel('${n}');document.getElementById('trackingnumber').value='${n}'" style="padding:.4rem .9rem;background:var(--surface-soft);border:1px solid var(--border);border-radius:var(--r-full);font-size:var(--text-xs);cursor:pointer;font-weight:600;color:var(--text-muted);transition:var(--t)" onmouseover="this.style.background='var(--primary-soft)';this.style.color='var(--primary)'" onmouseout="this.style.background='var(--surface-soft)';this.style.color='var(--text-muted)'"><i class="fas fa-history"></i> ${n}</button>`).join('');
 }
 
-function addToRecentSearches(trackingNumber) {
-    let searches = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || '[]');
-    // Remove if already exists
-    searches = searches.filter(s => s !== trackingNumber);
-    // Add to beginning
-    searches.unshift(trackingNumber);
-    // Keep only max
-    searches = searches.slice(0, MAX_RECENT_SEARCHES);
-    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
-    loadRecentSearches();
+function addRecentSearch(num) {
+  let s = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+  s = s.filter(x => x !== num);
+  s.unshift(num);
+  s = s.slice(0, MAX_RECENT);
+  localStorage.setItem(RECENT_KEY, JSON.stringify(s));
+  loadRecentSearches();
 }
 
-async function trackParcel(trackingNumber) {
-    const token = localStorage.getItem('token');
-    const resultsContainer = document.getElementById('tracking-results');
-
-    // Show loading
-    resultsContainer.innerHTML = `
-        <div class="card" style="margin-top: 2rem;">
-            <div class="loading-pulse" style="padding: 3rem;">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <p style="text-align: center; color: var(--secondary-color); margin-bottom: 2rem;">Tracking your parcel...</p>
-        </div>
-    `;
-
-    try {
-        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-        const response = await fetch(`/api/parcels/track/${trackingNumber}`, { headers });
-
-        if (response.ok) {
-            const parcel = await response.json();
-            addToRecentSearches(trackingNumber);
-            displayTrackingResults(parcel);
-        } else if (response.status === 404) {
-            resultsContainer.innerHTML = `
-                <div class="card reveal" style="margin-top: 2rem; text-align: center; padding: 3rem;">
-                    <div style="font-size: 5rem; color: var(--border-color); margin-bottom: 1.5rem;">
-                        <i class="fas fa-box-open" style="animation: float 3s ease-in-out infinite;"></i>
-                    </div>
-                    <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--dark-color); margin-bottom: 0.5rem;">Parcel Not Found</h3>
-                    <p style="color: var(--secondary-color); margin-bottom: 1.5rem;">
-                        We couldn't find a parcel with tracking number:<br>
-                        <strong style="font-family: var(--font-mono); color: var(--dark-color);">${trackingNumber}</strong>
-                    </p>
-                    <button class="btn btn-primary" onclick="document.getElementById('tracking_number').focus();">
-                        <i class="fas fa-search"></i> Try Again
-                    </button>
-                </div>
-            `;
-        } else if (response.status === 403) {
-            showAlert('You are not authorized to track this parcel. Please login.', 'warning');
-            resultsContainer.innerHTML = '';
-        }
-    } catch (error) {
-        console.error('Error tracking parcel:', error);
-        resultsContainer.innerHTML = `
-            <div class="card reveal" style="margin-top: 2rem; text-align: center; padding: 3rem;">
-                <div style="font-size: 5rem; color: var(--danger-color); margin-bottom: 1.5rem;">
-                    <i class="fas fa-exclamation-circle"></i>
-                </div>
-                <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--dark-color); margin-bottom: 0.5rem;">Error</h3>
-                <p style="color: var(--secondary-color); margin-bottom: 1.5rem;">An error occurred while tracking your parcel. Please try again.</p>
-                <button class="btn btn-primary" onclick="trackParcel('${trackingNumber}')">
-                    <i class="fas fa-sync"></i> Retry
-                </button>
-            </div>
-        `;
-    }
+async function trackParcel(num) {
+  const token = localStorage.getItem('token');
+  const c = document.getElementById('tracking-results');
+  c.innerHTML = `<div class="card reveal" style="margin-top:1rem"><div class="loading-pulse"><span></span><span></span><span></span></div><p style="text-align:center;color:var(--text-muted);padding-bottom:1.5rem">Tracking your parcel…</p></div>`;
+  try {
+    const headers = token ? {Authorization:'Bearer '+token} : {};
+    const res = await fetch(`/api/parcels/track/${num}`, {headers});
+    if (res.ok) { addRecentSearch(num); displayResult(await res.json()); }
+    else if (res.status === 404) {
+      c.innerHTML = `<div class="card reveal" style="margin-top:1rem;text-align:center;padding:2.5rem"><div class="empty-state-icon"><i class="fas fa-box-open"></i></div><h3>Parcel Not Found</h3><p>We couldn't find a parcel with tracking number <strong class="font-mono">${num}</strong></p><button class="btn btn-primary mt-4" onclick="document.getElementById('trackingnumber').focus()"><i class="fas fa-search"></i> Try Again</button></div>`;
+    } else if (res.status === 403) {
+      showAlert('You are not authorized to track this parcel. Please login.', 'warning');
+      c.innerHTML = '';
+    } else throw new Error();
+  } catch {
+    c.innerHTML = `<div class="card reveal" style="margin-top:1rem;text-align:center;padding:2.5rem"><div class="empty-state-icon" style="color:var(--danger)"><i class="fas fa-exclamation-circle"></i></div><h3>Error</h3><p>An error occurred while tracking. Please try again.</p><button class="btn btn-primary mt-4" onclick="trackParcel('${num}')"><i class="fas fa-sync"></i> Retry</button></div>`;
+  }
 }
 
-function displayTrackingResults(parcel) {
-    const container = document.getElementById('tracking-results');
+function displayResult(p) {
+  const steps = [
+    {status:'pending',    label:'Pending',          icon:'fa-clock',          desc:'Order received'},
+    {status:'pickedup',   label:'Picked Up',         icon:'fa-hand-holding',   desc:'Parcel collected'},
+    {status:'intransit',  label:'In Transit',        icon:'fa-truck',          desc:'On the way'},
+    {status:'outfordelivery', label:'Out for Delivery', icon:'fa-shipping-fast', desc:'Arriving today'},
+    {status:'delivered',  label:'Delivered',         icon:'fa-check-circle',   desc:'Successfully delivered'},
+  ];
+  const curIdx = steps.findIndex(s => s.status === p.status);
+  const c = document.getElementById('tracking-results');
+  c.innerHTML = `
+  <div class="card reveal" style="margin-top:1rem">
+    <div class="card-header">
+      <div>
+        <span class="badge badge-${p.status}" style="font-size:var(--text-sm);padding:.5rem 1rem">
+          <i class="fas ${sIcon(p.status)}"></i> ${sLabel(p.status)}
+        </span>
+        <p style="margin-top:.6rem;color:var(--text-muted);font-size:var(--text-sm)">Tracking <strong class="font-mono" style="color:var(--text)">${p.trackingnumber}</strong></p>
+      </div>
+      <div style="text-align:right">
+        <p style="font-size:var(--text-xs);color:var(--text-faint);margin-bottom:.2rem">Estimated Delivery</p>
+        <p style="font-weight:700"><i class="fas fa-calendar-alt" style="color:var(--primary);margin-right:.4rem"></i>${p.estimateddelivery || 'Calculating…'}</p>
+      </div>
+    </div>
+    <!-- Status Steps -->
+    <div class="status-progress">
+      ${steps.map((step, i) => {
+        const done = i < curIdx, curr = i === curIdx;
+        return `<div class="status-step ${done?'completed':''} ${curr?'current':''}">
+          <div class="status-step-icon"><i class="fas ${step.icon}"></i></div>
+          <p style="font-size:var(--text-xs);font-weight:${curr?'800':'600'};margin:0">${step.label}</p>
+          <p style="font-size:var(--text-xs);color:var(--text-faint);margin:0">${step.desc}</p>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
 
-    const statusSteps = [
-        { status: 'pending', label: 'Pending', icon: 'fa-clock', description: 'Order received' },
-        { status: 'picked_up', label: 'Picked Up', icon: 'fa-hand-holding', description: 'Parcel collected' },
-        { status: 'in_transit', label: 'In Transit', icon: 'fa-truck', description: 'On the way' },
-        { status: 'out_for_delivery', label: 'Out for Delivery', icon: 'fa-shipping-fast', description: 'Arriving today' },
-        { status: 'delivered', label: 'Delivered', icon: 'fa-check-circle', description: 'Successfully delivered' }
-    ];
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-top:1rem" class="tracking-grid">
+    <!-- Timeline -->
+    <div class="card reveal">
+      <div class="card-header"><h2 class="card-title"><i class="fas fa-history"></i> Tracking History</h2></div>
+      ${p.trackinghistory && p.trackinghistory.length ? `<div class="tracking-timeline">
+        ${p.trackinghistory.map((ev, i) => `<div class="tracking-event ${i>0?'completed':''}" style="animation-delay:${i*.1}s">
+          <div class="tracking-event-header">
+            <span class="tracking-event-status"><i class="fas ${sIcon(ev.status)}" style="color:${i===0?'var(--primary)':'var(--success)'}"></i> ${sLabel(ev.status)}</span>
+            <span class="tracking-event-time">${fmtDateTime(ev.timestamp)}</span>
+          </div>
+          ${ev.location ? `<div class="tracking-event-location"><i class="fas fa-map-marker-alt" style="color:var(--danger)"></i> ${ev.location}</div>` : ''}
+          ${ev.description ? `<div class="tracking-event-description">${ev.description}</div>` : ''}
+        </div>`).join('')}
+      </div>` : '<p style="color:var(--text-muted);text-align:center;padding:2rem">No tracking history available</p>'}
+    </div>
 
-    const currentStepIndex = statusSteps.findIndex(s => s.status === parcel.status);
+    <!-- Parcel Details -->
+    <div class="card reveal">
+      <div class="card-header"><h2 class="card-title"><i class="fas fa-info-circle"></i> Details</h2></div>
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <div class="info-item"><span class="info-label">Weight</span><span class="info-value"><i class="fas fa-weight-hanging" style="color:var(--primary)"></i> ${p.weight} kg</span></div>
+        ${p.dimensions ? `<div class="info-item"><span class="info-label">Dimensions</span><span class="info-value"><i class="fas fa-ruler-combined" style="color:var(--primary)"></i> ${p.dimensions}</span></div>` : ''}
+        ${p.category ? `<div class="info-item"><span class="info-label">Category</span><span class="info-value"><i class="fas fa-tag" style="color:var(--primary)"></i> ${cap(p.category)}</span></div>` : ''}
+        <div class="info-item"><span class="info-label">Shipping Cost</span><span class="info-value"><i class="fas fa-dollar-sign" style="color:var(--success)"></i> ${p.shippingcost ? '$'+p.shippingcost.toFixed(2) : 'N/A'}</span></div>
+        <div class="info-item"><span class="info-label">Created</span><span class="info-value"><i class="fas fa-calendar" style="color:var(--primary)"></i> ${fmtDateTime(p.createdat)}</span></div>
+        <hr style="border:none;border-top:1px solid var(--divider)">
+        <div class="info-item"><span class="info-label">Sender</span><span class="info-value"><i class="fas fa-user" style="color:var(--info)"></i> ${p.sender?.fullname || 'Unknown'}</span></div>
+        <div class="info-item"><span class="info-label">Receiver</span><span class="info-value"><i class="fas fa-user" style="color:var(--warning)"></i> ${p.receiver?.fullname || 'Unknown'}</span></div>
+        <div class="info-item"><span class="info-label">Pickup</span><span class="info-value" style="font-size:var(--text-xs)"><i class="fas fa-map-pin" style="color:var(--danger)"></i> ${p.pickupaddress}</span></div>
+        <div class="info-item"><span class="info-label">Delivery</span><span class="info-value" style="font-size:var(--text-xs)"><i class="fas fa-flag-checkered" style="color:var(--success)"></i> ${p.deliveryaddress}</span></div>
+      </div>
+    </div>
+  </div>`;
 
-    container.innerHTML = `
-        <!-- Status Progress -->
-        <div class="card reveal" style="margin-top: 2rem;">
-            <div class="card-header" style="flex-wrap: wrap; gap: 1rem;">
-                <div>
-                    <span class="badge badge-${parcel.status}" style="font-size: 1rem; padding: 0.5rem 1rem;">
-                        <i class="fas ${getStatusIcon(parcel.status)}"></i>
-                        ${formatStatus(parcel.status)}
-                    </span>
-                    <p style="margin-top: 0.75rem; color: var(--secondary-color);">
-                        Tracking #: <strong style="font-family: var(--font-mono); color: var(--dark-color);">${parcel.tracking_number}</strong>
-                    </p>
-                </div>
-                <div style="text-align: right;">
-                    <p style="font-size: 0.875rem; color: var(--secondary-color); margin-bottom: 0.25rem;">Estimated Delivery</p>
-                    <p style="font-weight: 700; color: var(--dark-color);">
-                        <i class="fas fa-calendar-alt" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
-                        ${parcel.estimated_delivery || 'Calculating...'}
-                    </p>
-                </div>
-            </div>
-
-            <div class="status-progress" style="padding: 2rem 0;">
-                ${statusSteps.map((step, index) => {
-                    const isCompleted = index <= currentStepIndex;
-                    const isCurrent = index === currentStepIndex;
-                    return `
-                        <div class="status-step ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}">
-                            <div class="status-step-icon" style="
-                                width: 60px;
-                                height: 60px;
-                                border-radius: 50%;
-                                background: ${isCompleted ? 'var(--primary-gradient)' : 'white'};
-                                border: 3px solid ${isCompleted ? 'var(--primary-color)' : 'var(--border-color)'};
-                                color: ${isCompleted ? 'white' : 'var(--secondary-color)'};
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 1.25rem;
-                                margin: 0 auto 1rem;
-                                box-shadow: ${isCurrent ? '0 0 20px var(--primary-glow)' : 'none'};
-                                animation: ${isCurrent ? 'pulse 2s ease-in-out infinite' : 'none'};
-                            ">
-                                <i class="fas ${step.icon}"></i>
-                            </div>
-                            <p style="
-                                font-size: 0.875rem;
-                                font-weight: ${isCurrent ? '700' : '600'};
-                                color: ${isCompleted ? 'var(--dark-color)' : 'var(--secondary-color)'};
-                                margin-bottom: 0.25rem;
-                            ">${step.label}</p>
-                            <p style="
-                                font-size: 0.75rem;
-                                color: var(--secondary-color);
-                            ">${step.description}</p>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
-            <!-- Tracking Timeline -->
-            <div class="card reveal" style="animation-delay: 0.1s;">
-                <div class="card-header">
-                    <h2 class="card-title"><i class="fas fa-history" style="color: var(--primary-color);"></i> Tracking History</h2>
-                </div>
-
-                <div class="tracking-timeline" style="padding-left: 1.5rem;">
-                    ${parcel.tracking_history && parcel.tracking_history.length > 0
-                        ? parcel.tracking_history.map((event, index) => `
-                            <div class="tracking-event ${index === 0 ? '' : 'completed'}" style="
-                                opacity: 0;
-                                animation: fadeInLeft 0.5s ease-out ${index * 0.1}s forwards;
-                            ">
-                                <div class="tracking-event-header" style="flex-wrap: wrap; gap: 0.5rem;">
-                                    <span class="tracking-event-status" style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <i class="fas ${getStatusIcon(event.status)}" style="color: ${index === 0 ? 'var(--primary-color)' : 'var(--success-color)'};"></i>
-                                        ${formatStatus(event.status)}
-                                    </span>
-                                    <span class="tracking-event-time" style="font-size: 0.8rem; background: var(--light-color); padding: 0.25rem 0.75rem; border-radius: var(--radius-full);">
-                                        ${formatDateTime(event.timestamp)}
-                                    </span>
-                                </div>
-                                ${event.location ? `
-                                    <div class="tracking-event-location">
-                                        <i class="fas fa-map-marker-alt" style="color: var(--danger-color);"></i> ${event.location}
-                                    </div>
-                                ` : ''}
-                                ${event.description ? `
-                                    <div class="tracking-event-description">${event.description}</div>
-                                ` : ''}
-                            </div>
-                        `).join('')
-                        : '<p style="color: var(--secondary-color); text-align: center; padding: 2rem;">No tracking history available</p>'
-                    }
-                </div>
-            </div>
-
-            <!-- Parcel Details -->
-            <div class="card reveal" style="animation-delay: 0.2s;">
-                <div class="card-header">
-                    <h2 class="card-title"><i class="fas fa-info-circle" style="color: var(--primary-color);"></i> Parcel Details</h2>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div class="info-item">
-                        <span class="info-label">Weight</span>
-                        <span class="info-value" style="display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-weight-hanging" style="color: var(--primary-color);"></i>
-                            ${parcel.weight} kg
-                        </span>
-                    </div>
-
-                    ${parcel.dimensions ? `
-                        <div class="info-item">
-                            <span class="info-label">Dimensions</span>
-                            <span class="info-value" style="display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fas fa-ruler-combined" style="color: var(--primary-color);"></i>
-                                ${parcel.dimensions}
-                            </span>
-                        </div>
-                    ` : ''}
-
-                    ${parcel.category ? `
-                        <div class="info-item">
-                            <span class="info-label">Category</span>
-                            <span class="info-value" style="display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fas fa-tag" style="color: var(--primary-color);"></i>
-                                ${capitalizeFirst(parcel.category)}
-                            </span>
-                        </div>
-                    ` : ''}
-
-                    <div class="info-item">
-                        <span class="info-label">Shipping Cost</span>
-                        <span class="info-value" style="display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-dollar-sign" style="color: var(--success-color);"></i>
-                            ${parcel.shipping_cost ? '$' + parcel.shipping_cost.toFixed(2) : 'N/A'}
-                        </span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Created</span>
-                        <span class="info-value" style="display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-calendar" style="color: var(--primary-color);"></i>
-                            ${formatDateTime(parcel.created_at)}
-                        </span>
-                    </div>
-
-                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
-
-                    <div class="info-item">
-                        <span class="info-label">Sender</span>
-                        <span class="info-value" style="display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-user" style="color: var(--info-color);"></i>
-                            ${parcel.sender ? parcel.sender.full_name : 'Unknown'}
-                        </span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Receiver</span>
-                        <span class="info-value" style="display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-user" style="color: var(--warning-color);"></i>
-                            ${parcel.receiver ? parcel.receiver.full_name : 'Unknown'}
-                        </span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Pickup Address</span>
-                        <span class="info-value" style="font-size: 0.85rem;">
-                            <i class="fas fa-map-pin" style="color: var(--danger-color); margin-right: 0.5rem;"></i>
-                            ${parcel.pickup_address}
-                        </span>
-                    </div>
-
-                    <div class="info-item">
-                        <span class="info-label">Delivery Address</span>
-                        <span class="info-value" style="font-size: 0.85rem;">
-                            <i class="fas fa-flag-checkered" style="color: var(--success-color); margin-right: 0.5rem;"></i>
-                            ${parcel.delivery_address}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Add fadeInLeft keyframes if not present
-    if (!document.getElementById('fadeInLeft-style')) {
-        const style = document.createElement('style');
-        style.id = 'fadeInLeft-style';
-        style.textContent = `
-            @keyframes fadeInLeft {
-                from {
-                    opacity: 0;
-                    transform: translateX(-20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            }
-            @keyframes pulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
+  // Make tracking grid responsive
+  const grid = c.querySelector('.tracking-grid');
+  if (window.innerWidth < 768) grid.style.gridTemplateColumns = '1fr';
+  window.addEventListener('resize', () => {
+    grid.style.gridTemplateColumns = window.innerWidth < 768 ? '1fr' : '2fr 1fr';
+  }, {passive:true});
 }
 
-function getStatusIcon(status) {
-    const icons = {
-        'pending': 'fa-clock',
-        'picked_up': 'fa-hand-holding',
-        'in_transit': 'fa-truck',
-        'out_for_delivery': 'fa-shipping-fast',
-        'delivered': 'fa-check-circle',
-        'cancelled': 'fa-times-circle'
-    };
-    return icons[status] || 'fa-circle';
-}
+const sIcon = s=>({pending:'fa-clock',pickedup:'fa-hand-holding',intransit:'fa-truck',outfordelivery:'fa-shipping-fast',delivered:'fa-check-circle',cancelled:'fa-times-circle'}[s]||'fa-circle');
+const sLabel = s=>({pending:'Pending',pickedup:'Picked Up',intransit:'In Transit',outfordelivery:'Out for Delivery',delivered:'Delivered',cancelled:'Cancelled'}[s]||s);
+const fmtDateTime = d => d ? new Date(d).toLocaleString('en-US',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : 'N/A';
+const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : '';
 
-function formatStatus(status) {
-    const statusMap = {
-        'pending': 'Pending',
-        'picked_up': 'Picked Up',
-        'in_transit': 'In Transit',
-        'out_for_delivery': 'Out for Delivery',
-        'delivered': 'Delivered',
-        'cancelled': 'Cancelled'
-    };
-    return statusMap[status] || status;
-}
-
-function formatDateTime(dateString) {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
-
-function capitalizeFirst(str) {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function showAlert(message, type) {
-    const container = document.getElementById('alert-container');
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.style.animation = 'fadeInUp 0.4s ease-out';
-    alert.innerHTML = message;
-
-    container.innerHTML = '';
-    container.appendChild(alert);
-
-    setTimeout(() => {
-        alert.style.animation = 'fadeOut 0.4s ease-out forwards';
-        setTimeout(() => alert.remove(), 400);
-    }, 5000);
-}
-
-// Add fadeOut keyframes if not present
-if (!document.getElementById('fadeOut-style')) {
-    const style = document.createElement('style');
-    style.id = 'fadeOut-style';
-    style.textContent = `
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-10px); }
-        }
-    `;
-    document.head.appendChild(style);
+function showAlert(msg, type) {
+  const c = document.getElementById('alert-container');
+  c.innerHTML = `<div class="alert alert-${type}" style="margin-bottom:1rem">${msg}</div>`;
+  setTimeout(()=>c.innerHTML='', 5000);
 }
 </script>
 {% endblock %}
