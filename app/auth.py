@@ -9,6 +9,7 @@ from app.database import get_db
 from app import models
 from app import schemas
 import os
+import re
 
 # Security settings
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -19,41 +20,55 @@ if not SECRET_KEY:
     )
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+MIN_PASSWORD_LENGTH = 8
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password):
+def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def get_user_by_username(db: Session, username: str):
+def validate_password(password: str) -> tuple[bool, Optional[str]]:
+    """Validate password strength. Returns (is_valid, error_message)."""
+    if len(password) < MIN_PASSWORD_LENGTH:
+        return False, f"Password must be at least {MIN_PASSWORD_LENGTH} characters long"
+    if not re.search(r"[a-z]", password):
+        return False, "Password must contain at least one lowercase letter"
+    if not re.search(r"[A-Z]", password):
+        return False, "Password must contain at least one uppercase letter"
+    if not re.search(r"\d", password):
+        return False, "Password must contain at least one number"
+    return True, None
+
+
+def get_user_by_username(db: Session, username: str) -> Optional[models.User]:
     return db.query(models.User).filter(models.User.username == username).first()
 
 
-def get_user_by_email(db: Session, email: str):
+def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
     return db.query(models.User).filter(models.User.email == email).first()
 
 
-def authenticate_user(db: Session, username: str, password: str):
+def authenticate_user(db: Session, username: str, password: str) -> Optional[models.User]:
     # Try to find user by username first
     user = get_user_by_username(db, username)
     # If not found, try by email
     if not user:
         user = get_user_by_email(db, username)
     if not user:
-        return False
+        return None
     if not verify_password(password, user.hashed_password):
-        return False
+        return None
     return user
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -67,7 +82,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
-):
+) -> models.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -90,7 +105,7 @@ async def get_current_user(
 
 async def get_current_active_user(
     current_user: models.User = Depends(get_current_user)
-):
+) -> models.User:
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
@@ -98,7 +113,7 @@ async def get_current_active_user(
 
 async def get_current_admin(
     current_user: models.User = Depends(get_current_active_user)
-):
+) -> models.User:
     if current_user.role != models.UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

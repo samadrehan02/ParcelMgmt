@@ -103,18 +103,41 @@ function displayResult(p) {
   ];
   const curIdx = steps.findIndex(s => s.status === p.status);
   const c = document.getElementById('tracking-results');
+
+  // Escape all user-controlled data to prevent XSS
+  const safe = {
+    trackingnumber: escapeHtml(p.trackingnumber),
+    status: escapeHtml(p.status),
+    estimateddelivery: escapeHtml(p.estimateddelivery || 'Calculating…'),
+    weight: escapeHtml(String(p.weight)),
+    dimensions: escapeHtml(p.dimensions || ''),
+    category: escapeHtml(p.category || ''),
+    shippingcost: p.shippingcost ? '$'+p.shippingcost.toFixed(2) : 'N/A',
+    createdat: escapeHtml(String(p.createdat)),
+    sendername: escapeHtml(p.sender?.full_name || 'Unknown'),
+    receivername: escapeHtml(p.receiver?.full_name || p.receiver_name || 'Unknown'),
+    pickupaddress: escapeHtml(p.pickupaddress),
+    deliveryaddress: escapeHtml(p.deliveryaddress),
+    trackinghistory: (p.trackinghistory || []).map(ev => ({
+      status: escapeHtml(ev.status),
+      timestamp: escapeHtml(String(ev.timestamp)),
+      location: escapeHtml(ev.location || ''),
+      description: escapeHtml(ev.description || '')
+    }))
+  };
+
   c.innerHTML = `
   <div class="card reveal" style="margin-top:1rem">
     <div class="card-header">
       <div>
-        <span class="badge badge-${p.status}" style="font-size:var(--text-sm);padding:.5rem 1rem">
-          <i class="fas ${sIcon(p.status)}"></i> ${sLabel(p.status)}
+        <span class="badge badge-${safe.status}" style="font-size:var(--text-sm);padding:.5rem 1rem">
+          <i class="fas ${sIcon(safe.status)}"></i> ${sLabel(safe.status)}
         </span>
-        <p style="margin-top:.6rem;color:var(--text-muted);font-size:var(--text-sm)">Tracking <strong class="font-mono" style="color:var(--text)">${p.trackingnumber}</strong></p>
+        <p style="margin-top:.6rem;color:var(--text-muted);font-size:var(--text-sm)">Tracking <strong class="font-mono" style="color:var(--text)">${safe.trackingnumber}</strong></p>
       </div>
       <div style="text-align:right">
         <p style="font-size:var(--text-xs);color:var(--text-faint);margin-bottom:.2rem">Estimated Delivery</p>
-        <p style="font-weight:700"><i class="fas fa-calendar-alt" style="color:var(--primary);margin-right:.4rem"></i>${p.estimateddelivery || 'Calculating…'}</p>
+        <p style="font-weight:700"><i class="fas fa-calendar-alt" style="color:var(--primary);margin-right:.4rem"></i>${safe.estimateddelivery}</p>
       </div>
     </div>
     <!-- Status Steps -->
@@ -134,8 +157,8 @@ function displayResult(p) {
     <!-- Timeline -->
     <div class="card reveal">
       <div class="card-header"><h2 class="card-title"><i class="fas fa-history"></i> Tracking History</h2></div>
-      ${p.trackinghistory && p.trackinghistory.length ? `<div class="tracking-timeline">
-        ${p.trackinghistory.map((ev, i) => `<div class="tracking-event ${i>0?'completed':''}" style="animation-delay:${i*.1}s">
+      ${safe.trackinghistory.length ? `<div class="tracking-timeline">
+        ${safe.trackinghistory.map((ev, i) => `<div class="tracking-event ${i>0?'completed':''}" style="animation-delay:${i*.1}s">
           <div class="tracking-event-header">
             <span class="tracking-event-status"><i class="fas ${sIcon(ev.status)}" style="color:${i===0?'var(--primary)':'var(--success)'}"></i> ${sLabel(ev.status)}</span>
             <span class="tracking-event-time">${fmtDateTime(ev.timestamp)}</span>
@@ -150,16 +173,16 @@ function displayResult(p) {
     <div class="card reveal">
       <div class="card-header"><h2 class="card-title"><i class="fas fa-info-circle"></i> Details</h2></div>
       <div style="display:flex;flex-direction:column;gap:.65rem">
-        <div class="info-item"><span class="info-label">Weight</span><span class="info-value"><i class="fas fa-weight-hanging" style="color:var(--primary)"></i> ${p.weight} kg</span></div>
-        ${p.dimensions ? `<div class="info-item"><span class="info-label">Dimensions</span><span class="info-value"><i class="fas fa-ruler-combined" style="color:var(--primary)"></i> ${p.dimensions}</span></div>` : ''}
-        ${p.category ? `<div class="info-item"><span class="info-label">Category</span><span class="info-value"><i class="fas fa-tag" style="color:var(--primary)"></i> ${cap(p.category)}</span></div>` : ''}
-        <div class="info-item"><span class="info-label">Shipping Cost</span><span class="info-value"><i class="fas fa-dollar-sign" style="color:var(--success)"></i> ${p.shippingcost ? '$'+p.shippingcost.toFixed(2) : 'N/A'}</span></div>
-        <div class="info-item"><span class="info-label">Created</span><span class="info-value"><i class="fas fa-calendar" style="color:var(--primary)"></i> ${fmtDateTime(p.createdat)}</span></div>
+        <div class="info-item"><span class="info-label">Weight</span><span class="info-value"><i class="fas fa-weight-hanging" style="color:var(--primary)"></i> ${safe.weight} kg</span></div>
+        ${safe.dimensions ? `<div class="info-item"><span class="info-label">Dimensions</span><span class="info-value"><i class="fas fa-ruler-combined" style="color:var(--primary)"></i> ${safe.dimensions}</span></div>` : ''}
+        ${safe.category ? `<div class="info-item"><span class="info-label">Category</span><span class="info-value"><i class="fas fa-tag" style="color:var(--primary)"></i> ${cap(safe.category)}</span></div>` : ''}
+        <div class="info-item"><span class="info-label">Shipping Cost</span><span class="info-value"><i class="fas fa-dollar-sign" style="color:var(--success)"></i> ${safe.shippingcost}</span></div>
+        <div class="info-item"><span class="info-label">Created</span><span class="info-value"><i class="fas fa-calendar" style="color:var(--primary)"></i> ${fmtDateTime(safe.createdat)}</span></div>
         <hr style="border:none;border-top:1px solid var(--divider)">
-        <div class="info-item"><span class="info-label">Sender</span><span class="info-value"><i class="fas fa-user" style="color:var(--info)"></i> ${p.sender?.fullname || 'Unknown'}</span></div>
-        <div class="info-item"><span class="info-label">Receiver</span><span class="info-value"><i class="fas fa-user" style="color:var(--warning)"></i> ${p.receiver?.fullname || 'Unknown'}</span></div>
-        <div class="info-item"><span class="info-label">Pickup</span><span class="info-value" style="font-size:var(--text-xs)"><i class="fas fa-map-pin" style="color:var(--danger)"></i> ${p.pickupaddress}</span></div>
-        <div class="info-item"><span class="info-label">Delivery</span><span class="info-value" style="font-size:var(--text-xs)"><i class="fas fa-flag-checkered" style="color:var(--success)"></i> ${p.deliveryaddress}</span></div>
+        <div class="info-item"><span class="info-label">Sender</span><span class="info-value"><i class="fas fa-user" style="color:var(--info)"></i> ${safe.sendername}</span></div>
+        <div class="info-item"><span class="info-label">Receiver</span><span class="info-value"><i class="fas fa-user" style="color:var(--warning)"></i> ${safe.receivername}</span></div>
+        <div class="info-item"><span class="info-label">Pickup</span><span class="info-value" style="font-size:var(--text-xs)"><i class="fas fa-map-pin" style="color:var(--danger)"></i> ${safe.pickupaddress}</span></div>
+        <div class="info-item"><span class="info-label">Delivery</span><span class="info-value" style="font-size:var(--text-xs)"><i class="fas fa-flag-checkered" style="color:var(--success)"></i> ${safe.deliveryaddress}</span></div>
       </div>
     </div>
   </div>`;
@@ -179,7 +202,7 @@ const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : '';
 
 function showAlert(msg, type) {
   const c = document.getElementById('alert-container');
-  c.innerHTML = `<div class="alert alert-${type}" style="margin-bottom:1rem">${msg}</div>`;
+  c.innerHTML = `<div class="alert alert-${type}" style="margin-bottom:1rem">${escapeHtml(msg)}</div>`;
   setTimeout(()=>c.innerHTML='', 5000);
 }
 </script>

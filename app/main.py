@@ -1,4 +1,5 @@
 import os
+import logging
 from dotenv import load_dotenv
 load_dotenv()  # Load .env before any other app imports read env vars
 
@@ -11,6 +12,10 @@ from app import models
 from app.database import engine, SessionLocal
 from app.routers import auth, parcels, admin
 from app.auth import get_password_hash
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Get absolute path to app directory for static files and templates
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,12 +37,12 @@ def init_demo_users():
                 phone="+1234567890",
                 address="Admin Office",
                 role=models.UserRole.ADMIN,
-                hashed_password=get_password_hash("admin123"),
+                hashed_password=get_password_hash(os.getenv("ADMIN_PASSWORD", "ChangeMe123!")),
                 is_active=True
             )
             db.add(admin_user)
             db.commit()
-            print("Admin user created: admin / admin123")
+            logger.info("Admin user created: admin")
 
         # Check if demo customer exists
         customer = db.query(models.User).filter(models.User.username == "demo").first()
@@ -49,14 +54,14 @@ def init_demo_users():
                 phone="+1987654321",
                 address="123 Demo Street, Demo City",
                 role=models.UserRole.CUSTOMER,
-                hashed_password=get_password_hash("demo123"),
+                hashed_password=get_password_hash(os.getenv("DEMO_PASSWORD", "DemoUser123!")),
                 is_active=True
             )
             db.add(demo_customer)
             db.commit()
-            print("Demo customer created: demo / demo123")
+            logger.info("Demo customer created: demo")
     except Exception as e:
-        print(f"Error creating demo users: {e}")
+        logger.error(f"Error creating demo users: {e}")
         db.rollback()
     finally:
         db.close()

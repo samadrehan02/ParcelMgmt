@@ -3,15 +3,28 @@
  * Redesigned: clean, modular, modern
  */
 
+// ─── Security Utilities ────────────────────────────────────────────────────────
+/**
+ * Escape HTML to prevent XSS attacks
+ * @param {string} str - String to escape
+ * @returns {string} - Escaped string safe for HTML insertion
+ */
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // ─── Auth Helpers ──────────────────────────────────────────────────────────────
 const Auth = {
   getToken:  () => localStorage.getItem('token'),
   getUser:   () => JSON.parse(localStorage.getItem('user') || 'null'),
   setToken:  (t) => localStorage.setItem('token', t),
   setUser:   (u) => localStorage.setItem('user', JSON.stringify(u)),
-  clear:     () => { localStorage.removeItem('token'); localStorage.removeItem('user'); },
   isAdmin:   () => { const u = Auth.getUser(); return u && u.role === 'admin'; },
   isLoggedIn:() => !!Auth.getToken(),
+  clear:     () => { localStorage.removeItem('token'); localStorage.removeItem('user'); },
 };
 
 // ─── Navbar auth state ─────────────────────────────────────────────────────────
@@ -20,9 +33,11 @@ function updateNavbar() {
   if (!authNav) return;
   const user = Auth.getUser();
   if (user) {
+    const dashboardUrl = user.role === 'admin' ? '/admin' : '/dashboard';
+    const firstName = escapeHtml(user.fullname?.split(' ')[0] || 'Dashboard');
     authNav.innerHTML = `
-      <a href="${user.role === 'admin' ? '/admin' : '/dashboard'}" class="btn btn-secondary btn-sm">
-        <i class="fas fa-user"></i> ${user.fullname?.split(' ')[0] || 'Dashboard'}
+      <a href="${dashboardUrl}" class="btn btn-secondary btn-sm">
+        <i class="fas fa-user"></i> ${firstName}
       </a>
       <button class="btn btn-primary btn-sm" id="logout-btn">
         <i class="fas fa-sign-out-alt"></i> Logout
@@ -33,7 +48,7 @@ function updateNavbar() {
     const nav = document.getElementById('main-nav');
     if (nav && !nav.querySelector('[data-nav="dashboard"]')) {
       const li = document.createElement('li');
-      li.innerHTML = `<a href="${user.role === 'admin' ? '/admin' : '/dashboard'}" class="nav-link" data-nav="dashboard"><i class="fas fa-th-large"></i> Dashboard</a>`;
+      li.innerHTML = `<a href="${dashboardUrl}" class="nav-link" data-nav="dashboard"><i class="fas fa-th-large"></i> Dashboard</a>`;
       nav.appendChild(li);
     }
   }
@@ -62,8 +77,9 @@ function showToast(message, type = 'info', duration = 4000) {
   const toast = document.createElement('div');
   toast.className = `alert alert-${type}`;
   toast.style.cssText = 'pointer-events:all;display:flex;align-items:center;gap:.6rem;animation:fadeSlideIn .3s ease';
-  toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${message}</span>
-    <button onclick="this.closest('.alert').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;opacity:.6;font-size:1rem">&#215;</button>`;
+  const escapedMessage = escapeHtml(message);
+  toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${escapedMessage}</span>
+    <button onclick="this.closest('.alert').remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;opacity:.6;font-size:1rem" aria-label="Close">&times;</button>`;
   container.appendChild(toast);
   if (duration > 0) setTimeout(() => toast.remove(), duration);
 }
@@ -73,9 +89,15 @@ async function apiFetch(url, options = {}) {
   const token = Auth.getToken();
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (token) headers['Authorization'] = 'Bearer ' + token;
-  const res = await fetch(url, { ...options, headers });
-  if (res.status === 401) { Auth.clear(); window.location.href = '/login'; return null; }
-  return res;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  try {
+    const res = await fetch(url, { ...options, headers, signal: controller.signal });
+    if (res.status === 401) { Auth.clear(); window.location.href = '/login'; return null; }
+    return res;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 // ─── Parcel status helpers ─────────────────────────────────────────────────────
@@ -129,4 +151,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ─── Exports for inline scripts ────────────────────────────────────────────────
-window.ParcelApp = { Auth, apiFetch, showToast, fmtDate, fmtDateTime, animateNumber, getStatusLabel, getStatusIcon };
+window.ParcelApp = { Auth, apiFetch, showToast, fmtDate, fmtDateTime, animateNumber, getStatusLabel, getStatusIcon, escapeHtml };

@@ -1,6 +1,5 @@
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status, Form
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app import models
@@ -12,7 +11,8 @@ from app.auth import (
     get_user_by_username,
     get_user_by_email,
     ACCESS_TOKEN_EXPIRE_MINUTES,
-    get_current_active_user
+    get_current_active_user,
+    validate_password,
 )
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
@@ -20,6 +20,14 @@ router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
 @router.post("/register", response_model=schemas.UserResponse)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    # Validate password strength
+    is_valid, error_msg = validate_password(user.password)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error_msg
+        )
+
     # Check if username exists
     db_user = get_user_by_username(db, username=user.username)
     if db_user:
@@ -54,10 +62,11 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=schemas.Token)
 def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    username: str = Form(...),
+    password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    user = authenticate_user(db, form_data.username, form_data.password)
+    user = authenticate_user(db, username, password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -97,3 +106,9 @@ def update_user(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+@router.post("/logout")
+def logout(current_user: models.User = Depends(get_current_active_user)):
+    """Logout endpoint - client should clear local storage token."""
+    return {"message": "Successfully logged out", "success": True}

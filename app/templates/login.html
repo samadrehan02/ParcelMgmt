@@ -63,16 +63,27 @@ document.getElementById('login-form').addEventListener('submit', async e => {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in…';
   btn.disabled = true;
   try {
-    const res = await fetch('/api/auth/login', {method:'POST', body: new URLSearchParams(new FormData(e.target)), headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+    const fd = new FormData(e.target);
+    const params = new URLSearchParams();
+    params.append('username', fd.get('username'));
+    params.append('password', fd.get('password'));
+    const res = await fetch('/api/auth/login', {method:'POST', body: params, headers:{'Content-Type':'application/x-www-form-urlencoded'}});
     const data = await res.json();
+    console.log('Login response:', res.status, data);
     if (res.ok) {
       localStorage.setItem('token', data.access_token);
       localStorage.setItem('user', JSON.stringify(data.user));
       showAlert('Login successful! Redirecting…', 'success');
       setTimeout(() => { window.location.href = data.user.role === 'admin' ? '/admin' : '/dashboard'; }, 900);
-    } else { showAlert(data.detail || 'Login failed.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
-  } catch { showAlert('An error occurred.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
+    } else { showAlert(formatError(data), 'error'); btn.innerHTML = orig; btn.disabled = false; }
+  } catch(err) { console.error('Login error:', err); showAlert('An error occurred.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
 });
+function formatError(r) {
+  if (!r.detail) return 'Login failed.';
+  if (Array.isArray(r.detail)) return r.detail.map(e => e.msg || String(e)).join(', ');
+  if (typeof r.detail === 'object') return r.detail.msg || JSON.stringify(r.detail);
+  return String(r.detail);
+}
 const tp = document.getElementById('toggle-password');
 const pi = document.getElementById('password');
 tp.addEventListener('click', () => {

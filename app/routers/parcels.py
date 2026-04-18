@@ -20,13 +20,16 @@ router = APIRouter(prefix="/api/parcels", tags=["parcels"])
 @router.get("/admin/all", response_model=List[schemas.ParcelListResponse])
 def get_all_parcels(
     status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 100,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_admin)
 ):
+    """Get all parcels with optional status filter and pagination."""
     query = db.query(models.Parcel)
     if status:
         query = query.filter(models.Parcel.status == status)
-    return query.all()
+    return query.offset(skip).limit(limit).all()
 
 
 @router.put("/admin/{parcel_id}", response_model=schemas.ParcelResponse)
@@ -52,9 +55,9 @@ def update_parcel(
 
     if 'status' in update_data and update_data['status'] != old_status:
         event_descriptions = {
-            "picked_up": "Parcel picked up from sender",
-            "in_transit": "Parcel is in transit",
-            "out_for_delivery": "Parcel is out for delivery",
+            "pickedup": "Parcel picked up from sender",
+            "intransit": "Parcel is in transit",
+            "outfordelivery": "Parcel is out for delivery",
             "delivered": "Parcel delivered successfully",
             "cancelled": "Parcel delivery cancelled"
         }
@@ -120,15 +123,25 @@ def create_parcel(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_active_user)
 ):
-    receiver = db.query(models.User).filter(models.User.id == parcel.receiver_id).first()
-    if not receiver:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Receiver not found")
+    # Validate receiver: either receiver_id OR receiver details must be provided
+    if parcel.receiver_id:
+        receiver = db.query(models.User).filter(models.User.id == parcel.receiver_id).first()
+        if not receiver:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Receiver not found")
+    elif not parcel.receiver_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either select a registered receiver or provide receiver name, phone, and email"
+        )
 
     tracking_number = generate_tracking_number()
     db_parcel = models.Parcel(
         tracking_number=tracking_number,
         sender_id=current_user.id,
         receiver_id=parcel.receiver_id,
+        receiver_name=parcel.receiver_name,
+        receiver_phone=parcel.receiver_phone,
+        receiver_email=parcel.receiver_email,
         weight=parcel.weight,
         dimensions=parcel.dimensions,
         description=parcel.description,
@@ -171,14 +184,16 @@ def get_customers(
 
 @router.get("/my-parcels", response_model=List[schemas.ParcelListResponse])
 def get_my_parcels(
+    skip: int = 0,
+    limit: int = 100,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_active_user)
 ):
-    """Get all parcels where user is either sender or receiver"""
+    """Get all parcels where user is either sender or receiver with pagination."""
     parcels = db.query(models.Parcel).filter(
         (models.Parcel.sender_id == current_user.id) |
         (models.Parcel.receiver_id == current_user.id)
-    ).all()
+    ).offset(skip).limit(limit).all()
     return parcels
 
 

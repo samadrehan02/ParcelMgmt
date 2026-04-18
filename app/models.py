@@ -16,9 +16,9 @@ class UserRole(str, enum.Enum):
 
 class ParcelStatus(str, enum.Enum):
     PENDING = "pending"
-    PICKED_UP = "picked_up"
-    IN_TRANSIT = "in_transit"
-    OUT_FOR_DELIVERY = "out_for_delivery"
+    PICKED_UP = "pickedup"
+    IN_TRANSIT = "intransit"
+    OUT_FOR_DELIVERY = "outfordelivery"
     DELIVERED = "delivered"
     CANCELLED = "cancelled"
 
@@ -47,7 +47,12 @@ class Parcel(Base):
     id = Column(Integer, primary_key=True, index=True)
     tracking_number = Column(String, unique=True, index=True, nullable=False)
     sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    receiver_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    receiver_id = Column(Integer, ForeignKey("users.id"), nullable=True)  # Optional for unregistered receivers
+
+    # Receiver details (for unregistered receivers)
+    receiver_name = Column(String, nullable=True)
+    receiver_phone = Column(String, nullable=True)
+    receiver_email = Column(String, nullable=True)
 
     # Parcel details
     weight = Column(Float, nullable=False)

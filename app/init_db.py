@@ -1,9 +1,13 @@
 """
 Initialize the database with default data.
 Run this script to create an admin user.
+
+IMPORTANT: Change default passwords in production!
+Set ADMIN_PASSWORD and DEMO_PASSWORD environment variables.
 """
 import sys
 import os
+import logging
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -11,6 +15,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.database import SessionLocal, engine
 from app import models
 from app.auth import get_password_hash
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def init_db():
@@ -32,16 +39,15 @@ def init_db():
                 phone="+1234567890",
                 address="Admin Office",
                 role=models.UserRole.ADMIN,
-                hashed_password=get_password_hash("admin123"),
+                hashed_password=get_password_hash(os.getenv("ADMIN_PASSWORD", "ChangeMe123!")),
                 is_active=True
             )
             db.add(admin_user)
             db.commit()
-            print("Admin user created successfully!")
-            print("Username: admin")
-            print("Password: admin123")
+            logger.info("Admin user created: admin")
+            logger.warning("CHANGE DEFAULT PASSWORD in production!")
         else:
-            print("Admin user already exists.")
+            logger.info("Admin user already exists.")
 
         # Check if demo customer exists
         customer = db.query(models.User).filter(models.User.username == "demo").first()
@@ -55,19 +61,17 @@ def init_db():
                 phone="+1987654321",
                 address="123 Demo Street, Demo City",
                 role=models.UserRole.CUSTOMER,
-                hashed_password=get_password_hash("demo123"),
+                hashed_password=get_password_hash(os.getenv("DEMO_PASSWORD", "DemoUser123!")),
                 is_active=True
             )
             db.add(demo_customer)
             db.commit()
-            print("\nDemo customer created successfully!")
-            print("Username: demo")
-            print("Password: demo123")
+            logger.info("Demo customer created: demo")
         else:
-            print("\nDemo customer already exists.")
+            logger.info("Demo customer already exists.")
 
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
         db.rollback()
     finally:
         db.close()

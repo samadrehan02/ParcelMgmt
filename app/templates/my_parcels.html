@@ -96,17 +96,28 @@ function applyFilter() {
 function displayParcels(parcels) {
   const c = document.getElementById('parcels-container');
   if (!parcels.length) {
-    c.innerHTML = `<div class="empty-state"><i class="fas fa-box-open empty-state-icon"></i><h3>No parcels found</h3><p>${currentFilter==='all'?'Send your first parcel to get started':'No parcels in this category'}</p>${currentFilter==='all'?'<a href="/create-parcel" class="btn btn-primary mt-4">Send Your First Parcel</a>':''}</div>`;
+    const filterMsg = currentFilter==='all' ? 'Send your first parcel to get started' : 'No parcels in this category';
+    c.innerHTML = `<div class="empty-state"><i class="fas fa-box-open empty-state-icon"></i><h3>No parcels found</h3><p>${escapeHtml(filterMsg)}</p>${currentFilter==='all'?'<a href="/create-parcel" class="btn btn-primary mt-4">Send Your First Parcel</a>':''}</div>`;
     return;
   }
+  // Escape user-controlled data to prevent XSS
+  const safeParcels = parcels.map(p => ({
+    ...p,
+    trackingnumber: escapeHtml(p.trackingnumber),
+    status: escapeHtml(p.status),
+    weight: escapeHtml(String(p.weight)),
+    shippingcost: p.shippingcost ? '$'+p.shippingcost.toFixed(2) : '—',
+    createdat: escapeHtml(String(p.createdat)),
+    parcelType: escapeHtml(p.parcelType)
+  }));
   c.innerHTML = `<div class="table-container"><table class="table"><thead><tr><th>Tracking</th><th>Type</th><th>Status</th><th>Weight</th><th>Cost</th><th>Date</th><th>Action</th></tr></thead><tbody>
-${parcels.map((p,i)=>`<tr style="animation:fadeSlideIn .4s ${i*.05}s both">
+${safeParcels.map((p,i)=>`<tr style="animation:fadeSlideIn .4s ${i*.05}s both">
 <td><span class="font-mono">${p.trackingnumber}</span></td>
 <td><span class="badge" style="background:${p.parcelType==='sent'?'var(--info-soft)':'#ffe8f5'};color:${p.parcelType==='sent'?'#2060c8':'#be185d'}"><i class="fas ${p.parcelType==='sent'?'fa-arrow-up':'fa-arrow-down'}"></i> ${p.parcelType==='sent'?'Sent':'Received'}</span></td>
 <td><span class="badge badge-${p.status}"><i class="fas ${sIcon(p.status)}"></i> ${sLabel(p.status)}</span></td>
-<td>${p.weight} kg</td><td>${p.shippingcost?'$'+p.shippingcost.toFixed(2):'—'}</td>
+<td>${p.weight} kg</td><td>${p.shippingcost}</td>
 <td>${fmtDate(p.createdat)}</td>
-<td><a href="/track?number=${p.trackingnumber}" class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i> View</a></td>
+<td><a href="/track?number=${encodeURIComponent(p.trackingnumber)}" class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i> View</a></td>
 </tr>`).join('')}
 </tbody></table></div>`;
 }

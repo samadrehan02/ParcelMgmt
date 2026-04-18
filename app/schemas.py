@@ -83,7 +83,10 @@ class ParcelBase(BaseModel):
 
 
 class ParcelCreate(ParcelBase):
-    receiver_id: int
+    receiver_id: Optional[int] = None
+    receiver_name: Optional[str] = None
+    receiver_phone: Optional[str] = None
+    receiver_email: Optional[str] = None
 
 
 class ParcelUpdate(BaseModel):
@@ -97,7 +100,10 @@ class ParcelResponse(ParcelBase):
     id: int
     tracking_number: str
     sender_id: int
-    receiver_id: int
+    receiver_id: Optional[int] = None
+    receiver_name: Optional[str] = None
+    receiver_phone: Optional[str] = None
+    receiver_email: Optional[str] = None
     status: ParcelStatus
     is_paid: bool
     created_at: datetime

@@ -97,8 +97,16 @@ function displayParcels(parcels) {
     c.innerHTML = `<div class="empty-state"><i class="fas fa-box-open empty-state-icon"></i><h3>No parcels yet</h3><p>You haven't sent or received any parcels yet</p><a href="/create-parcel" class="btn btn-primary mt-4">Send Your First Parcel</a></div>`;
     return;
   }
+  // Escape user-controlled data to prevent XSS
+  const safeParcels = parcels.map(p => ({
+    ...p,
+    trackingnumber: escapeHtml(p.trackingnumber),
+    status: escapeHtml(p.status),
+    weight: escapeHtml(String(p.weight)),
+    createdat: escapeHtml(String(p.createdat))
+  }));
   c.innerHTML = `<div class="table-container"><table class="table"><thead><tr><th>Tracking</th><th>Status</th><th>Weight</th><th>Date</th><th>Action</th></tr></thead><tbody>
-${parcels.map((p,i) => `<tr style="animation:fadeSlideIn .4s ${i*.07}s both"><td><span class="font-mono">${p.trackingnumber}</span></td><td><span class="badge badge-${p.status}"><i class="fas ${statusIcon(p.status)}"></i> ${statusLabel(p.status)}</span></td><td>${p.weight} kg</td><td>${fmtDate(p.createdat)}</td><td><a href="/track?number=${p.trackingnumber}" class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i> View</a></td></tr>`).join('')}
+${safeParcels.map((p,i) => `<tr style="animation:fadeSlideIn .4s ${i*.07}s both"><td><span class="font-mono">${p.trackingnumber}</span></td><td><span class="badge badge-${p.status}"><i class="fas ${statusIcon(p.status)}"></i> ${statusLabel(p.status)}</span></td><td>${p.weight} kg</td><td>${fmtDate(p.createdat)}</td><td><a href="/track?number=${encodeURIComponent(p.trackingnumber)}" class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i> View</a></td></tr>`).join('')}
 </tbody></table></div>`;
 }
 const statusIcon = s => ({pending:'fa-clock',pickedup:'fa-hand-holding',intransit:'fa-truck',outfordelivery:'fa-shipping-fast',delivered:'fa-check-circle',cancelled:'fa-times-circle'}[s]||'fa-circle');

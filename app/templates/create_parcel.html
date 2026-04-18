@@ -21,18 +21,65 @@
         <div class="section-icon teal"><i class="fas fa-user"></i></div>
         Receiver Information
       </div>
+
+      <!-- Receiver Type Toggle -->
       <div class="form-group">
-        <label class="form-label" for="receiverid">Select Receiver</label>
-        <div class="input-icon-wrapper">
-          <select class="form-control" id="receiverid" name="receiverid" required>
-            <option value="">— Select a user —</option>
-          </select>
-          <i class="fas fa-users"></i>
+        <label class="form-label">Receiver Type</label>
+        <div style="display:flex;gap:1rem;margin-top:.5rem">
+          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+            <input type="radio" name="receiver_type" value="registered" checked onchange="toggleReceiverType()">
+            <span>Registered User</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+            <input type="radio" name="receiver_type" value="unregistered" onchange="toggleReceiverType()">
+            <span>New Recipient (Not Registered)</span>
+          </label>
         </div>
-        <p class="form-text"><i class="fas fa-info-circle"></i> The receiver must be a registered user</p>
       </div>
+
+      <!-- Registered User Selection -->
+      <div id="registered-receiver-section">
+        <div class="form-group">
+          <label class="form-label" for="receiverid">Select Receiver</label>
+          <div class="input-icon-wrapper">
+            <select class="form-control" id="receiverid" name="receiverid">
+              <option value="">— Select a user —</option>
+            </select>
+            <i class="fas fa-users"></i>
+          </div>
+          <p class="form-text"><i class="fas fa-info-circle"></i> Select from registered users</p>
+        </div>
+      </div>
+
+      <!-- Unregistered Receiver Details -->
+      <div id="unregistered-receiver-section" style="display:none">
+        <div class="form-group">
+          <label class="form-label" for="receivername">Receiver Name *</label>
+          <div class="input-icon-wrapper">
+            <input type="text" class="form-control" id="receivername" name="receivername" placeholder="Enter receiver's full name">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label class="form-label" for="receiverphone">Phone Number *</label>
+            <div class="input-icon-wrapper">
+              <input type="tel" class="form-control" id="receiverphone" name="receiverphone" placeholder="Enter phone number">
+              <i class="fas fa-phone"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="receiveremail">Email Address</label>
+            <div class="input-icon-wrapper">
+              <input type="email" class="form-control" id="receiveremail" name="receiveremail" placeholder="Enter email (optional)">
+              <i class="fas fa-envelope"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group">
-        <label class="form-label" for="deliveryaddress">Delivery Address</label>
+        <label class="form-label" for="deliveryaddress">Delivery Address *</label>
         <div class="input-icon-wrapper">
           <textarea class="form-control" id="deliveryaddress" name="deliveryaddress" rows="3" required placeholder="Enter the complete delivery address including city, state, and ZIP code" style="padding-left:2.9rem;padding-top:1rem"></textarea>
           <i class="fas fa-map-marker-alt" style="top:1.15rem;transform:none"></i>
@@ -135,6 +182,14 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => { checkAuth(); loadUsers(); });
 function checkAuth() { if (!localStorage.getItem('token')) window.location.href = '/login'; }
+function toggleReceiverType() {
+  const isRegistered = document.querySelector('input[name="receiver_type"]:checked').value === 'registered';
+  document.getElementById('registered-receiver-section').style.display = isRegistered ? 'block' : 'none';
+  document.getElementById('unregistered-receiver-section').style.display = isRegistered ? 'none' : 'block';
+  document.getElementById('receiverid').required = isRegistered;
+  document.getElementById('receivername').required = !isRegistered;
+  document.getElementById('receiverphone').required = !isRegistered;
+}
 async function loadUsers() {
   const token = localStorage.getItem('token');
   const sel = document.getElementById('receiverid');
@@ -144,7 +199,7 @@ async function loadUsers() {
     if (res.ok) {
       const users = await res.json();
       sel.innerHTML = '<option value="">— Select a user —</option>';
-      users.forEach(u => { sel.innerHTML += `<option value="${u.id}">${u.fullname} (${u.username})</option>`; });
+      users.forEach(u => { sel.innerHTML += `<option value="${u.id}">${u.full_name} (${u.username})</option>`; });
     } else throw new Error();
   } catch { sel.innerHTML = '<option value="">Error loading users</option>'; }
   finally { sel.disabled = false; }
@@ -156,21 +211,48 @@ document.getElementById('create-parcel-form').addEventListener('submit', async e
   const btn = e.target.querySelector('button[type=submit]');
   const orig = btn.innerHTML;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating parcel…'; btn.disabled = true;
-  const data = {receiverid:parseInt(fd.get('receiverid')),weight:parseFloat(fd.get('weight')),dimensions:fd.get('dimensions'),description:fd.get('description'),category:fd.get('category'),pickupaddress:fd.get('pickupaddress'),deliveryaddress:fd.get('deliveryaddress'),shippingcost:fd.get('shippingcost')?parseFloat(fd.get('shippingcost')):null};
+
+  const isRegistered = fd.get('receiver_type') === 'registered';
+  const data = {
+    receiver_id: isRegistered ? parseInt(fd.get('receiverid')) || null : null,
+    receiver_name: isRegistered ? null : fd.get('receivername'),
+    receiver_phone: isRegistered ? null : fd.get('receiverphone'),
+    receiver_email: isRegistered ? null : fd.get('receiveremail'),
+    weight: parseFloat(fd.get('weight')),
+    dimensions: fd.get('dimensions'),
+    description: fd.get('description'),
+    category: fd.get('category'),
+    pickup_address: fd.get('pickupaddress'),
+    delivery_address: fd.get('deliveryaddress'),
+    shipping_cost: fd.get('shippingcost') ? parseFloat(fd.get('shippingcost')) : null
+  };
+
+  // Validation
+  if (isRegistered && !data.receiver_id) {
+    showAlert('Please select a registered receiver.', 'error');
+    btn.innerHTML = orig; btn.disabled = false;
+    return;
+  }
+  if (!isRegistered && !data.receiver_name) {
+    showAlert('Please enter receiver name.', 'error');
+    btn.innerHTML = orig; btn.disabled = false;
+    return;
+  }
+
   try {
     const res = await fetch('/api/parcels/create', {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(data)});
     const r = await res.json();
     if (res.ok) {
-      showAlert(`Parcel created! Tracking: ${r.trackingnumber}`, 'success');
+      showAlert(`Parcel created! Tracking: ${r.tracking_number}`, 'success');
       btn.innerHTML = '<i class="fas fa-check"></i> Created!';
       btn.style.background = 'var(--success)';
-      setTimeout(() => window.location.href = `/track?number=${r.trackingnumber}`, 1500);
-    } else { showAlert(r.detail||'Failed to create parcel.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
-  } catch { showAlert('An error occurred.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
+      setTimeout(() => window.location.href = `/track?number=${r.tracking_number}`, 1500);
+    } else { showAlert(r.detail || JSON.stringify(r), 'error'); btn.innerHTML = orig; btn.disabled = false; }
+  } catch(err) { console.error(err); showAlert('An error occurred.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
 });
 function showAlert(msg, type) {
   const c = document.getElementById('alert-container');
-  c.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  c.innerHTML = `<div class="alert alert-${type}">${escapeHtml(msg)}</div>`;
   setTimeout(()=>c.innerHTML='', 6000);
 }
 </script>

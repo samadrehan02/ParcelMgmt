@@ -191,20 +191,34 @@ function displayParcels(parcels) {
     c.innerHTML = `<div class="empty-state"><i class="fas fa-box-open empty-state-icon"></i><h3>No parcels found</h3></div>`;
     return;
   }
+  // Escape user-controlled data to prevent XSS
+  const safeParcels = parcels.map(p => ({
+    ...p,
+    trackingnumber: escapeHtml(p.trackingnumber),
+    status: escapeHtml(p.status),
+    sendername: escapeHtml(p.sendername || ''),
+    senderid: escapeHtml(String(p.senderid)),
+    receivername: escapeHtml(p.receivername || ''),
+    receiverid: escapeHtml(String(p.receiverid)),
+    weight: escapeHtml(String(p.weight)),
+    shippingcost: p.shippingcost ? '$' + p.shippingcost.toFixed(2) : '—',
+    createdat: escapeHtml(String(p.createdat)),
+    id: escapeHtml(String(p.id))
+  }));
   c.innerHTML = `<div class="table-container"><table class="table"><thead><tr>
     <th>Tracking</th><th>Status</th><th>Sender</th><th>Receiver</th><th>Weight</th><th>Cost</th><th>Created</th><th>Actions</th>
   </tr></thead><tbody>
-  ${parcels.map((p, i) => `<tr style="animation:fadeSlideIn .4s ${i * .03}s both">
+  ${safeParcels.map((p, i) => `<tr style="animation:fadeSlideIn .4s ${i * .03}s both">
     <td><span class="font-mono" style="font-size:var(--text-xs)">${p.trackingnumber}</span></td>
     <td><span class="badge badge-${p.status}"><i class="fas ${sIcon(p.status)}"></i> ${sLabel(p.status)}</span></td>
     <td>${p.sendername || p.senderid}</td>
     <td>${p.receivername || p.receiverid}</td>
     <td>${p.weight} kg</td>
-    <td>${p.shippingcost ? '$' + p.shippingcost.toFixed(2) : '—'}</td>
+    <td>${p.shippingcost}</td>
     <td>${fmtDate(p.createdat)}</td>
     <td><div style="display:flex;gap:.4rem">
       <button class="btn btn-primary btn-sm" onclick="openModal('${p.id}','${p.status}')" title="Update Status"><i class="fas fa-edit"></i></button>
-      <a href="/track?number=${p.trackingnumber}" class="btn btn-secondary btn-sm" title="View Details"><i class="fas fa-eye"></i></a>
+      <a href="/track?number=${encodeURIComponent(p.trackingnumber)}" class="btn btn-secondary btn-sm" title="View Details"><i class="fas fa-eye"></i></a>
     </div></td>
   </tr>`).join('')}
   </tbody></table></div>`;

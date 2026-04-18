@@ -134,12 +134,28 @@ document.getElementById('register-form').addEventListener('submit', async e => {
   if (fd.get('password') !== fd.get('confirm-password')) { showAlert('Passwords do not match.', 'error'); return; }
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account…'; btn.disabled = true;
   try {
-    const res = await fetch('/api/auth/register', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(Object.fromEntries(fd))});
+    const payload = {
+      full_name: fd.get('fullname'),
+      username: fd.get('username'),
+      email: fd.get('email'),
+      phone: fd.get('phone'),
+      address: fd.get('address'),
+      password: fd.get('password')
+    };
+    const res = await fetch('/api/auth/register', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
     const r = await res.json();
+    console.log('Register response:', res.status, r);
     if (res.ok) { showAlert('Account created! Redirecting to login…', 'success'); setTimeout(() => window.location.href = '/login', 1500); }
-    else { showAlert(r.detail || 'Registration failed.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
-  } catch { showAlert('An error occurred.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
+    else { showAlert(formatError(r), 'error'); btn.innerHTML = orig; btn.disabled = false; }
+  } catch(err) { console.error('Register error:', err); showAlert('An error occurred.', 'error'); btn.innerHTML = orig; btn.disabled = false; }
 });
+function formatError(r) {
+  console.log('Error response:', JSON.stringify(r));
+  if (!r.detail) return r.message || JSON.stringify(r) || 'Registration failed.';
+  if (Array.isArray(r.detail)) return r.detail.map(e => e.msg || String(e)).join(', ');
+  if (typeof r.detail === 'object') return r.detail.msg || JSON.stringify(r.detail);
+  return String(r.detail);
+}
 function showAlert(msg, type) {
   const c = document.getElementById('alert-container');
   c.innerHTML = `<div class="alert alert-${type}" style="margin-bottom:1rem">${msg}</div>`;
